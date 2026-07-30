@@ -1,0 +1,16 @@
+id,name,description,category,price,cost,stock_quantity
+1,Laptop,15-inch business laptop,Electronics,75000,55000,120
+2,Wireless Mouse,Ergonomic wireless mouse,Electronics,1200,700,350
+3,Mechanical Keyboard,RGB mechanical keyboard,Electronics,3500,2200,180
+4,27-inch Monitor,4K IPS monitor,Electronics,18000,14000,90
+5,USB-C Hub,7-in-1 USB-C hub,Electronics,2000,1200,250
+6,Running Shoes,Lightweight running shoes,Clothing,4500,2800,140
+7,Cotton T-Shirt,100% cotton t-shirt,Clothing,800,400,500
+8,Denim Jeans,Slim fit denim jeans,Clothing,1800,1000,220
+9,Office Chair,Ergonomic office chair,Furniture,8500,6000,60
+10,Coffee Maker,Automatic coffee maker,Home,3500,2400,75
+11,Water Bottle,Insulated steel bottle,Home,600,250,400
+12,Desk Lamp,LED desk lamp,Home,1500,900,160
+13,Study Table,Wooden study table,Furniture,6500,4700,55
+14,Bookshelf,5-tier bookshelf,Furniture,5500,3900,45
+15,Bluetooth Speaker,Portable Bluetooth speaker,Electronics,5000,3400,130
