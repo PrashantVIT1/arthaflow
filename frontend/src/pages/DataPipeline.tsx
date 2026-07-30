@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Card from '../components/ui/Card';
 import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check } from 'lucide-react';
 import { pipelineApi, etlApi, SampleDatasetMetadata, UploadResponse, ETLRunResponse } from '../services/api';
@@ -9,6 +9,14 @@ const DataPipeline: React.FC = () => {
   const [datasetSource, setDatasetSource] = useState<'sample' | 'custom'>('sample');
   const [isDragging, setIsDragging] = useState(false);
   const [importMode, setImportMode] = useState<'append' | 'replace' | 'clear'>('append');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // File retention mode state
+  const [fileRetentionMode, setFileRetentionMode] = useState<'delete' | 'archive'>('delete');
+  const [archivePin, setArchivePin] = useState('');
+  const [verifyingPin, setVerifyingPin] = useState(false);
+  const [archiveModeVerified, setArchiveModeVerified] = useState(false);
+  const [archiveVerificationError, setArchiveVerificationError] = useState<string | null>(null);
   
   // Track the last custom import mode to restore when switching back to custom dataset
   const [lastCustomImportMode, setLastCustomImportMode] = useState<'append' | 'replace' | 'clear'>('append');
@@ -184,6 +192,12 @@ const DataPipeline: React.FC = () => {
   const handleRunPipeline = async () => {
     if (runningPipeline) return;
     
+    // Check if archive mode is selected but not verified
+    if (datasetSource === 'custom' && fileRetentionMode === 'archive' && !archiveModeVerified) {
+      setUploadError('Please verify the PIN to enable archive mode before running the pipeline.');
+      return;
+    }
+    
     // Reset pipeline state before starting new execution
     resetPipelineState();
     setRunningPipeline(true);
@@ -208,6 +222,11 @@ const DataPipeline: React.FC = () => {
         setSamplePipelineResult(response);
       } else {
         setCustomPipelineResult(response);
+        // Clear upload state after successful custom dataset pipeline execution
+        // Only clear if delete mode is selected (archive mode keeps files)
+        if (response.success && fileRetentionMode === 'delete') {
+          clearUploadState();
+        }
       }
       console.log('Pipeline result:', response);
     } catch (error) {
@@ -285,6 +304,53 @@ const DataPipeline: React.FC = () => {
         mode: 'clear'
       });
       setRunningPipeline(false);
+    }
+  };
+
+  const clearUploadState = () => {
+    // Clear upload response and error
+    setUploadResponse(null);
+    setUploadError(null);
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleVerifyArchivePin = async () => {
+    if (!archivePin.trim()) {
+      setArchiveVerificationError('Please enter a PIN');
+      return;
+    }
+
+    setVerifyingPin(true);
+    setArchiveVerificationError(null);
+    
+    try {
+      const response = await etlApi.verifyArchiveMode(archivePin);
+      if (response.success && response.archiveEnabled) {
+        setArchiveModeVerified(true);
+        setArchiveVerificationError(null);
+      } else {
+        setArchiveModeVerified(false);
+        setArchiveVerificationError(response.message || 'Verification failed');
+      }
+    } catch (error) {
+      console.error('Failed to verify archive PIN:', error);
+      setArchiveModeVerified(false);
+      setArchiveVerificationError('Failed to verify PIN. Please try again.');
+    } finally {
+      setVerifyingPin(false);
+    }
+  };
+
+  const handleFileRetentionModeChange = (mode: 'delete' | 'archive') => {
+    setFileRetentionMode(mode);
+    // Reset archive verification when switching away from archive mode
+    if (mode === 'delete') {
+      setArchiveModeVerified(false);
+      setArchivePin('');
+      setArchiveVerificationError(null);
     }
   };
   return (
@@ -493,6 +559,7 @@ const DataPipeline: React.FC = () => {
                       className="hidden"
                       accept=".csv,.json"
                       multiple
+                      ref={fileInputRef}
                       onChange={(e) => handleFileSelect(e.target.files)}
                     />
                   </label>
@@ -557,6 +624,79 @@ const DataPipeline: React.FC = () => {
                       customPipelineResult.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
                     }`}>
                       {customPipelineResult.message}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </Card>
+        )}
+
+        {datasetSource === 'custom' && importMode !== 'clear' && (
+          <Card title="Uploaded File Retention" subtitle="Choose whether to delete or archive uploaded files after successful import" className="transition-all duration-200">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="radio"
+                  id="delete-files"
+                  name="file-retention"
+                  value="delete"
+                  checked={fileRetentionMode === 'delete'}
+                  onChange={() => handleFileRetentionModeChange('delete')}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="delete-files" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Delete uploaded files after successful import (Recommended)
+                </label>
+              </div>
+              <div className="flex items-center space-x-3">
+                <input
+                  type="radio"
+                  id="archive-files"
+                  name="file-retention"
+                  value="archive"
+                  checked={fileRetentionMode === 'archive'}
+                  onChange={() => handleFileRetentionModeChange('archive')}
+                  className="w-4 h-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                />
+                <label htmlFor="archive-files" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Archive uploaded files
+                </label>
+              </div>
+
+              {fileRetentionMode === 'archive' && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  {!archiveModeVerified ? (
+                    <div className="space-y-3">
+                      <div>
+                        <label htmlFor="archive-pin" className="block text-sm font-medium text-gray-700 mb-2">
+                          Admin PIN
+                        </label>
+                        <input
+                          type="password"
+                          id="archive-pin"
+                          value={archivePin}
+                          onChange={(e) => setArchivePin(e.target.value)}
+                          placeholder="Enter PIN to enable archive mode"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+                          disabled={verifyingPin}
+                        />
+                      </div>
+                      {archiveVerificationError && (
+                        <p className="text-sm text-red-600">{archiveVerificationError}</p>
+                      )}
+                      <button
+                        onClick={handleVerifyArchivePin}
+                        disabled={verifyingPin || !archivePin.trim()}
+                        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+                      >
+                        {verifyingPin ? 'Verifying...' : 'Verify'}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2 text-sm text-green-700">
+                      <Check className="w-4 h-4" />
+                      <span className="font-medium">Archive Mode Enabled</span>
                     </div>
                   )}
                 </div>

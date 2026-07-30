@@ -3,7 +3,7 @@ import os
 import pandas as pd
 from typing import Dict, Any, List
 from datetime import datetime
-from app.schemas.etl import ETLRunRequest, ETLRunResponse, ETLStatus, ETLLogEntry, ETLLogsResponse, ETLState
+from app.schemas.etl import ETLRunRequest, ETLRunResponse, ETLStatus, ETLLogEntry, ETLLogsResponse, ETLState, ArchiveModeVerifyResponse
 from app.database.config import get_engine
 from sqlalchemy import text
 
@@ -30,6 +30,9 @@ etl_state = {
     "last_execution": None,
     "last_successful_import_timestamp": None
 }
+
+# In-memory archive mode flag (session-based)
+archive_mode_enabled = False
 
 
 class ETLService:
@@ -111,6 +114,49 @@ class ETLService:
         """Get ETL logs."""
         global etl_logs
         return ETLLogsResponse(logs=etl_logs)
+    
+    def verify_archive_mode(self, pin: str) -> ArchiveModeVerifyResponse:
+        """
+        Verify archive mode PIN.
+        
+        Args:
+            pin: PIN to verify
+            
+        Returns:
+            ArchiveModeVerifyResponse with verification result
+        """
+        global archive_mode_enabled
+        archive_pin = os.getenv("ARCHIVE_UPLOAD_PIN")
+        
+        if not archive_pin:
+            return ArchiveModeVerifyResponse(
+                success=False,
+                archiveEnabled=False,
+                message="Archive mode not configured on server"
+            )
+        
+        if pin == archive_pin:
+            archive_mode_enabled = True
+            return ArchiveModeVerifyResponse(
+                success=True,
+                archiveEnabled=True
+            )
+        else:
+            return ArchiveModeVerifyResponse(
+                success=False,
+                archiveEnabled=False,
+                message="Invalid PIN"
+            )
+    
+    def is_archive_mode_enabled(self) -> bool:
+        """
+        Check if archive mode is currently enabled.
+        
+        Returns:
+            True if archive mode is enabled, False otherwise
+        """
+        global archive_mode_enabled
+        return archive_mode_enabled
     
     def run_pipeline(self, request: ETLRunRequest) -> ETLRunResponse:
         """
@@ -344,6 +390,11 @@ class ETLService:
                 last_successful_import_timestamp=datetime.now()
             )
             
+            # Delete uploaded files after successful import if archive mode is not enabled
+            if request.dataset_source == 'custom' and request.files and not self.is_archive_mode_enabled():
+                self._delete_uploaded_files(request.files)
+                self._add_log("info", "Uploaded files deleted after successful import", "cleanup")
+            
             return response
             
         except Exception as e:
@@ -359,6 +410,24 @@ class ETLService:
             for table in tables:
                 conn.execute(text(f"DELETE FROM {table}"))
             conn.commit()
+    
+    def _delete_uploaded_files(self, files: list) -> None:
+        """
+        Delete uploaded files from storage.
+        
+        Args:
+            files: List of file info dictionaries with 'saved_as' key
+        """
+        for file_info in files:
+            saved_as = file_info.get('saved_as')
+            if saved_as:
+                file_path = os.path.join(self.upload_dir, saved_as)
+                if os.path.exists(file_path):
+                    try:
+                        os.remove(file_path)
+                        self._add_log("info", f"Deleted uploaded file: {saved_as}", "cleanup")
+                    except Exception as e:
+                        self._add_log("warning", f"Failed to delete file {saved_as}: {str(e)}", "cleanup")
     
     def _load_sample_data(self, engine, response: ETLRunResponse, import_mode: str) -> None:
         """Load sample data from data directory."""
