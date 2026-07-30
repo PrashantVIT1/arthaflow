@@ -21,10 +21,8 @@ app = FastAPI(
 
 # CORS Configuration - Read from environment variable or use default
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5174")
-print("FRONTEND_URL =", frontend_url)
 
 origins = frontend_url.split(",") if frontend_url else ["http://localhost:5174"]
-print("Allowed Origins =", origins)
 
 app.add_middleware(
     CORSMiddleware,
