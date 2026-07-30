@@ -60,3 +60,15 @@ class ETLState(BaseModel):
     last_execution: Optional[dict] = None  # Last execution details
     last_successful_import_timestamp: Optional[datetime] = None
 
+
+class ArchiveModeVerifyRequest(BaseModel):
+    """Request for archive mode verification."""
+    pin: str
+
+
+class ArchiveModeVerifyResponse(BaseModel):
+    """Response for archive mode verification."""
+    success: bool
+    archiveEnabled: bool = False
+    message: Optional[str] = None
+

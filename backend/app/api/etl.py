@@ -3,7 +3,7 @@ import os
 import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import List
-from app.schemas.etl import ETLRunRequest, ETLRunResponse, ETLStatus, ETLLogsResponse, ETLState
+from app.schemas.etl import ETLRunRequest, ETLRunResponse, ETLStatus, ETLLogsResponse, ETLState, ArchiveModeVerifyRequest, ArchiveModeVerifyResponse
 from app.services.etl import ETLService
 
 router = APIRouter(prefix="/etl", tags=["etl"])
@@ -113,5 +113,23 @@ async def get_etl_state():
     try:
         service = ETLService()
         return service.get_state()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/archive-mode/verify", response_model=ArchiveModeVerifyResponse)
+async def verify_archive_mode(request: ArchiveModeVerifyRequest):
+    """
+    Verify archive mode PIN.
+    
+    Args:
+        request: Archive mode verification request with PIN
+        
+    Returns:
+        ArchiveModeVerifyResponse with verification result
+    """
+    try:
+        service = ETLService()
+        return service.verify_archive_mode(request.pin)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

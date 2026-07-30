@@ -128,6 +128,16 @@ export interface ETLState {
   last_successful_import_timestamp?: string;
 }
 
+export interface ArchiveModeVerifyRequest {
+  pin: string;
+}
+
+export interface ArchiveModeVerifyResponse {
+  success: boolean;
+  archiveEnabled: boolean;
+  message?: string;
+}
+
 export interface DashboardResponse {
   kpis: DashboardKPI;
   monthly_sales: MonthlySales[];
@@ -323,6 +333,11 @@ export const etlApi = {
 
   getETLState: async (): Promise<ETLState> => {
     const response = await api.get('/etl/state');
+    return response.data;
+  },
+
+  verifyArchiveMode: async (pin: string): Promise<ArchiveModeVerifyResponse> => {
+    const response = await api.post('/etl/archive-mode/verify', { pin });
     return response.data;
   },
 };
