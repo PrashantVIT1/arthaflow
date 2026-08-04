@@ -1,4 +1,5 @@
 """Schemas for ETL operations."""
+
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -6,13 +7,17 @@ from datetime import datetime
 
 class ETLRunRequest(BaseModel):
     """Request for running ETL pipeline."""
+
     dataset_source: str  # 'sample' or 'custom'
     import_mode: str  # 'append', 'replace', or 'clear'
-    files: Optional[List[dict]] = None  # List of {saved_as: str, original_name: str} for custom source
+    files: Optional[List[dict]] = (
+        None  # List of {saved_as: str, original_name: str} for custom source
+    )
 
 
 class ETLRunResponse(BaseModel):
     """Response for ETL pipeline execution."""
+
     success: bool
     message: str
     mode: str
@@ -29,6 +34,7 @@ class ETLRunResponse(BaseModel):
 
 class ETLStatus(BaseModel):
     """ETL pipeline status."""
+
     status: str  # 'idle', 'running', 'completed', 'error'
     current_stage: Optional[str] = None
     progress: Optional[float] = None  # 0.0 to 1.0
@@ -39,6 +45,7 @@ class ETLStatus(BaseModel):
 
 class ETLLogEntry(BaseModel):
     """ETL log entry."""
+
     timestamp: datetime
     level: str  # 'info', 'warning', 'error'
     message: str
@@ -47,11 +54,13 @@ class ETLLogEntry(BaseModel):
 
 class ETLLogsResponse(BaseModel):
     """Response for ETL logs."""
+
     logs: List[ETLLogEntry]
 
 
 class ETLState(BaseModel):
     """Persistent ETL pipeline state."""
+
     dataset_source: str  # 'sample' or 'custom'
     import_mode: str  # 'append', 'replace', or 'clear'
     uploaded_files: Optional[List[str]] = None  # List of uploaded filenames
@@ -63,12 +72,13 @@ class ETLState(BaseModel):
 
 class ArchiveModeVerifyRequest(BaseModel):
     """Request for archive mode verification."""
+
     pin: str
 
 
 class ArchiveModeVerifyResponse(BaseModel):
     """Response for archive mode verification."""
+
     success: bool
     archiveEnabled: bool = False
     message: Optional[str] = None
-

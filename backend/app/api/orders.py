@@ -1,4 +1,5 @@
 """API routes for order endpoints."""
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 def get_orders(
     page: int = Query(1, ge=1, description="Page number (starts from 1)"),
     size: int = Query(10, ge=1, le=10000, description="Number of items per page"),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """
     Get orders with server-side pagination.
@@ -59,7 +60,7 @@ def get_orders(
             "has_next": has_next,
             "has_previous": has_previous,
             "first_page": first_page,
-            "last_page": last_page
+            "last_page": last_page,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -69,55 +70,59 @@ def get_orders(
 def export_orders_csv(db: Session = Depends(get_db)):
     """
     Export orders data as CSV.
-    
+
     Returns:
         CSV file with all orders data
     """
     try:
         orders = db.query(Order).all()
-        
+
         output = io.StringIO()
         writer = csv.writer(output)
-        
+
         # Write header
-        writer.writerow([
-            "Order ID",
-            "Order Number",
-            "Customer ID",
-            "Product ID",
-            "Quantity",
-            "Unit Price",
-            "Total Amount",
-            "Order Date",
-            "Status",
-            "Region",
-            "Created At",
-            "Updated At"
-        ])
-        
+        writer.writerow(
+            [
+                "Order ID",
+                "Order Number",
+                "Customer ID",
+                "Product ID",
+                "Quantity",
+                "Unit Price",
+                "Total Amount",
+                "Order Date",
+                "Status",
+                "Region",
+                "Created At",
+                "Updated At",
+            ]
+        )
+
         # Write data rows
         for order in orders:
-            writer.writerow([
-                order.id,
-                order.order_number,
-                order.customer_id,
-                order.product_id,
-                order.quantity,
-                order.unit_price,
-                order.total_amount,
-                order.order_date.isoformat() if order.order_date else "",
-                order.status,
-                order.region or "",
-                order.created_at.isoformat() if order.created_at else "",
-                order.updated_at.isoformat() if order.updated_at else ""
-            ])
-        
+            writer.writerow(
+                [
+                    order.id,
+                    order.order_number,
+                    order.customer_id,
+                    order.product_id,
+                    order.quantity,
+                    order.unit_price,
+                    order.total_amount,
+                    order.order_date.isoformat() if order.order_date else "",
+                    order.status,
+                    order.region or "",
+                    order.created_at.isoformat() if order.created_at else "",
+                    order.updated_at.isoformat() if order.updated_at else "",
+                ]
+            )
+
         output.seek(0)
-        
+
         return StreamingResponse(
-            io.BytesIO(output.getvalue().encode('utf-8')),
-            media_type='text/csv',
-            headers={'Content-Disposition': 'attachment; filename="orders.csv"'}
+            io.BytesIO(output.getvalue().encode("utf-8")),
+            media_type="text/csv",
+            headers={"Content-Disposition": 'attachment; filename="orders.csv"'},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

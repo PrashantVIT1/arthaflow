@@ -5,6 +5,7 @@ from app.database.config import Base
 
 class Product(Base):
     """Product model for retail analytics."""
+
     __tablename__ = "products"
 
     id = Column(Integer, primary_key=True, index=True)

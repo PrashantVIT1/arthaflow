@@ -4,7 +4,7 @@ from app.schemas.analytics import (
     CategorySales,
     RegionalSales,
     TopProduct,
-    DashboardResponse
+    DashboardResponse,
 )
 
 __all__ = [
@@ -13,5 +13,5 @@ __all__ = [
     "CategorySales",
     "RegionalSales",
     "TopProduct",
-    "DashboardResponse"
+    "DashboardResponse",
 ]

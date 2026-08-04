@@ -1,9 +1,18 @@
 """API routes for ETL endpoints."""
+
 import os
 import uuid
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from typing import List
-from app.schemas.etl import ETLRunRequest, ETLRunResponse, ETLStatus, ETLLogsResponse, ETLState, ArchiveModeVerifyRequest, ArchiveModeVerifyResponse
+from app.schemas.etl import (
+    ETLRunRequest,
+    ETLRunResponse,
+    ETLStatus,
+    ETLLogsResponse,
+    ETLState,
+    ArchiveModeVerifyRequest,
+    ArchiveModeVerifyResponse,
+)
 from app.services.etl import ETLService
 
 router = APIRouter(prefix="/etl", tags=["etl"])
@@ -13,55 +22,56 @@ router = APIRouter(prefix="/etl", tags=["etl"])
 async def upload_files(files: List[UploadFile] = File(...)):
     """
     Upload files for ETL processing.
-    
+
     Args:
         files: List of files to upload (multipart/form-data)
-        
+
     Returns:
         Success message with uploaded files
     """
     print("Upload endpoint entered")
     print(f"Received {len(files)} files")
-    
+
     # Create uploads directory if it doesn't exist
-    upload_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'uploads')
+    upload_dir = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads"
+    )
     os.makedirs(upload_dir, exist_ok=True)
-    
+
     uploaded_files = []
-    
+
     for file in files:
         # Generate unique filename
         file_ext = os.path.splitext(file.filename)[1]
         unique_filename = f"{uuid.uuid4()}{file_ext}"
         file_path = os.path.join(upload_dir, unique_filename)
-        
+
         # Save file
         content = await file.read()
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             f.write(content)
-        
-        uploaded_files.append({
-            "originalName": file.filename,
-            "savedAs": unique_filename,
-            "size": len(content)
-        })
-    
+
+        uploaded_files.append(
+            {
+                "originalName": file.filename,
+                "savedAs": unique_filename,
+                "size": len(content),
+            }
+        )
+
     print("Returning response")
-    
-    return {
-        "success": True,
-        "uploadedFiles": uploaded_files
-    }
+
+    return {"success": True, "uploadedFiles": uploaded_files}
 
 
 @router.post("/run", response_model=ETLRunResponse)
 async def run_pipeline(request: ETLRunRequest):
     """
     Run ETL pipeline.
-    
+
     Args:
         request: ETL run request with dataset source, import mode, and files
-        
+
     Returns:
         ETLRunResponse with execution results
     """
@@ -76,7 +86,7 @@ async def run_pipeline(request: ETLRunRequest):
 async def get_etl_status():
     """
     Get current ETL pipeline status.
-    
+
     Returns:
         ETLStatus with current pipeline status
     """
@@ -91,7 +101,7 @@ async def get_etl_status():
 async def get_etl_logs():
     """
     Get ETL execution logs.
-    
+
     Returns:
         ETLLogsResponse with execution logs
     """
@@ -106,7 +116,7 @@ async def get_etl_logs():
 async def get_etl_state():
     """
     Get persistent ETL pipeline state.
-    
+
     Returns:
         ETLState with current pipeline state including dataset source, import mode, uploaded files, and last execution details
     """
@@ -121,10 +131,10 @@ async def get_etl_state():
 async def verify_archive_mode(request: ArchiveModeVerifyRequest):
     """
     Verify archive mode PIN.
-    
+
     Args:
         request: Archive mode verification request with PIN
-        
+
     Returns:
         ArchiveModeVerifyResponse with verification result
     """

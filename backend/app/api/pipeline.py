@@ -1,4 +1,5 @@
 """API routes for data pipeline endpoints."""
+
 from fastapi import APIRouter, Depends, HTTPException
 from app.services.pipeline import PipelineService
 from app.schemas.pipeline import SampleDatasetMetadata
@@ -10,7 +11,7 @@ router = APIRouter(prefix="/pipeline", tags=["pipeline"])
 def get_sample_dataset_metadata():
     """
     Get metadata for sample dataset.
-    
+
     Returns:
         SampleDatasetMetadata with dataset information including name, customers, products, and orders count
     """

@@ -1,4 +1,5 @@
 """Schemas for customer operations."""
+
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
@@ -6,6 +7,7 @@ from datetime import datetime
 
 class CustomerResponse(BaseModel):
     """Customer response with aggregated order data."""
+
     id: int
     name: str
     email: str

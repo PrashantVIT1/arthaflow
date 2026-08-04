@@ -1,4 +1,5 @@
 """Pydantic schemas for analytics DTOs."""
+
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -6,6 +7,7 @@ from datetime import datetime
 
 class DashboardKPI(BaseModel):
     """Key Performance Indicators for dashboard."""
+
     total_revenue: float
     total_orders: int
     total_customers: int
@@ -16,6 +18,7 @@ class DashboardKPI(BaseModel):
 
 class MonthlySales(BaseModel):
     """Monthly sales data."""
+
     year: int
     month: int
     month_name: str
@@ -26,6 +29,7 @@ class MonthlySales(BaseModel):
 
 class CategorySales(BaseModel):
     """Sales by category."""
+
     category: str
     revenue: float
     orders: int
@@ -34,6 +38,7 @@ class CategorySales(BaseModel):
 
 class RegionalSales(BaseModel):
     """Sales by region."""
+
     region: str
     revenue: float
     orders: int
@@ -42,6 +47,7 @@ class RegionalSales(BaseModel):
 
 class TopProduct(BaseModel):
     """Top selling product."""
+
     product_id: int
     product_name: str
     category: str
@@ -52,6 +58,7 @@ class TopProduct(BaseModel):
 
 class DashboardResponse(BaseModel):
     """Dashboard response with KPIs and trends."""
+
     kpis: DashboardKPI
     monthly_sales: List[MonthlySales]
     category_sales: List[CategorySales]

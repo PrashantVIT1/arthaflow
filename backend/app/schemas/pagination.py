@@ -1,12 +1,14 @@
 """Schemas for pagination operations."""
+
 from pydantic import BaseModel
 from typing import List, TypeVar, Generic
 
-T = TypeVar('T')
+T = TypeVar("T")
 
 
 class PaginatedResponse(BaseModel, Generic[T]):
     """Generic paginated response schema."""
+
     items: List[T]
     current_page: int
     page_size: int

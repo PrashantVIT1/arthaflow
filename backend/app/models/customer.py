@@ -5,6 +5,7 @@ from app.database.config import Base
 
 class Customer(Base):
     """Customer model for retail analytics."""
+
     __tablename__ = "customers"
 
     id = Column(Integer, primary_key=True, index=True)

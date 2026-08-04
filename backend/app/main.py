@@ -16,7 +16,7 @@ from app.api.orders import router as orders_router
 app = FastAPI(
     title="ArthaFlow API",
     description="Enterprise ETL & Business Analytics Platform API",
-    version="1.0.0"
+    version="1.0.0",
 )
 
 # CORS Configuration - Read from environment variable or use default

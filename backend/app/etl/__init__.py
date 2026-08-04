@@ -13,5 +13,5 @@ __all__ = [
     "Cleaner",
     "Transformer",
     "Loader",
-    "ETLPipeline"
+    "ETLPipeline",
 ]

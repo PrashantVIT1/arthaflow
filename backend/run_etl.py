@@ -2,6 +2,7 @@
 ETL Pipeline runner script.
 Run this from the backend directory to execute the ETL pipeline.
 """
+
 import sys
 from pathlib import Path
 from dotenv import load_dotenv
@@ -20,22 +21,22 @@ from app.etl import ETLPipeline
 def main():
     """Run the ETL pipeline."""
     print("Starting ETL Pipeline...")
-    
+
     # Initialize pipeline
     pipeline = ETLPipeline()
-    
+
     # Run pipeline with options
     results = pipeline.run(
-        truncate=True,         # Truncate tables before loading to ensure clean state
-        skip_validation=False, # Set to True to skip validation
-        skip_load=False       # Set to True to skip database loading
+        truncate=True,  # Truncate tables before loading to ensure clean state
+        skip_validation=False,  # Set to True to skip validation
+        skip_load=False,  # Set to True to skip database loading
     )
-    
+
     # Print results
     print("\n=== Pipeline Results ===")
     for stage, result in results.items():
         print(f"{stage}: {result}")
-    
+
     return results
 
 

@@ -2,6 +2,7 @@
 Seed data script for retail analytics platform.
 Run this script to populate the database with sample data.
 """
+
 from dotenv import load_dotenv
 import os
 
@@ -9,8 +10,10 @@ import os
 load_dotenv()
 
 # Ensure DATABASE_URL is set
-if not os.getenv('DATABASE_URL'):
-    os.environ['DATABASE_URL'] = 'postgresql://postgres:1234567890@localhost:5432/insightflow'
+if not os.getenv("DATABASE_URL"):
+    os.environ["DATABASE_URL"] = (
+        "postgresql://postgres:1234567890@localhost:5432/insightflow"
+    )
 
 from sqlalchemy.orm import Session
 from app.database.config import engine, SessionLocal
@@ -28,7 +31,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0101",
             "address": "123 Main St",
             "city": "New York",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "Sarah Johnson",
@@ -36,7 +39,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0102",
             "address": "456 Oak Ave",
             "city": "Los Angeles",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "Michael Brown",
@@ -44,7 +47,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0103",
             "address": "789 Pine Rd",
             "city": "Chicago",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "Emily Davis",
@@ -52,7 +55,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0104",
             "address": "321 Elm St",
             "city": "Houston",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "David Wilson",
@@ -60,7 +63,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0105",
             "address": "654 Maple Dr",
             "city": "Phoenix",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "Emma Martinez",
@@ -68,7 +71,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0106",
             "address": "987 Cedar Ln",
             "city": "Miami",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "James Anderson",
@@ -76,7 +79,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0107",
             "address": "147 Birch Blvd",
             "city": "Seattle",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "Olivia Taylor",
@@ -84,7 +87,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0108",
             "address": "258 Spruce Way",
             "city": "Denver",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "William Thomas",
@@ -92,7 +95,7 @@ def seed_customers(db: Session):
             "phone": "+1-555-0109",
             "address": "369 Aspen Ct",
             "city": "Boston",
-            "country": "USA"
+            "country": "USA",
         },
         {
             "name": "Sophia Garcia",
@@ -100,8 +103,8 @@ def seed_customers(db: Session):
             "phone": "+1-555-0110",
             "address": "741 Willow Pl",
             "city": "Atlanta",
-            "country": "USA"
-        }
+            "country": "USA",
+        },
     ]
 
     customers = []
@@ -109,11 +112,11 @@ def seed_customers(db: Session):
         customer = Customer(**data)
         db.add(customer)
         customers.append(customer)
-    
+
     db.commit()
     for customer in customers:
         db.refresh(customer)
-    
+
     print(f"Seeded {len(customers)} customers")
     return customers
 
@@ -127,7 +130,7 @@ def seed_products(db: Session):
             "category": "Electronics",
             "price": 1299.99,
             "cost": 800.00,
-            "stock_quantity": 50
+            "stock_quantity": 50,
         },
         {
             "name": "Wireless Mouse",
@@ -135,7 +138,7 @@ def seed_products(db: Session):
             "category": "Electronics",
             "price": 49.99,
             "cost": 15.00,
-            "stock_quantity": 200
+            "stock_quantity": 200,
         },
         {
             "name": "Mechanical Keyboard",
@@ -143,7 +146,7 @@ def seed_products(db: Session):
             "category": "Electronics",
             "price": 149.99,
             "cost": 60.00,
-            "stock_quantity": 100
+            "stock_quantity": 100,
         },
         {
             "name": "27-inch Monitor",
@@ -151,7 +154,7 @@ def seed_products(db: Session):
             "category": "Electronics",
             "price": 399.99,
             "cost": 250.00,
-            "stock_quantity": 75
+            "stock_quantity": 75,
         },
         {
             "name": "USB-C Hub",
@@ -159,7 +162,7 @@ def seed_products(db: Session):
             "category": "Electronics",
             "price": 39.99,
             "cost": 12.00,
-            "stock_quantity": 150
+            "stock_quantity": 150,
         },
         {
             "name": "Running Shoes",
@@ -167,7 +170,7 @@ def seed_products(db: Session):
             "category": "Clothing",
             "price": 89.99,
             "cost": 35.00,
-            "stock_quantity": 120
+            "stock_quantity": 120,
         },
         {
             "name": "Cotton T-Shirt",
@@ -175,7 +178,7 @@ def seed_products(db: Session):
             "category": "Clothing",
             "price": 24.99,
             "cost": 8.00,
-            "stock_quantity": 300
+            "stock_quantity": 300,
         },
         {
             "name": "Denim Jeans",
@@ -183,7 +186,7 @@ def seed_products(db: Session):
             "category": "Clothing",
             "price": 59.99,
             "cost": 22.00,
-            "stock_quantity": 200
+            "stock_quantity": 200,
         },
         {
             "name": "Winter Jacket",
@@ -191,7 +194,7 @@ def seed_products(db: Session):
             "category": "Clothing",
             "price": 149.99,
             "cost": 55.00,
-            "stock_quantity": 80
+            "stock_quantity": 80,
         },
         {
             "name": "Coffee Maker",
@@ -199,7 +202,7 @@ def seed_products(db: Session):
             "category": "Home",
             "price": 79.99,
             "cost": 30.00,
-            "stock_quantity": 90
+            "stock_quantity": 90,
         },
         {
             "name": "Blender",
@@ -207,7 +210,7 @@ def seed_products(db: Session):
             "category": "Home",
             "price": 99.99,
             "cost": 40.00,
-            "stock_quantity": 70
+            "stock_quantity": 70,
         },
         {
             "name": "Desk Lamp",
@@ -215,7 +218,7 @@ def seed_products(db: Session):
             "category": "Home",
             "price": 34.99,
             "cost": 12.00,
-            "stock_quantity": 180
+            "stock_quantity": 180,
         },
         {
             "name": "Office Chair",
@@ -223,7 +226,7 @@ def seed_products(db: Session):
             "category": "Furniture",
             "price": 299.99,
             "cost": 120.00,
-            "stock_quantity": 40
+            "stock_quantity": 40,
         },
         {
             "name": "Bookshelf",
@@ -231,7 +234,7 @@ def seed_products(db: Session):
             "category": "Furniture",
             "price": 149.99,
             "cost": 60.00,
-            "stock_quantity": 60
+            "stock_quantity": 60,
         },
         {
             "name": "Standing Desk",
@@ -239,8 +242,8 @@ def seed_products(db: Session):
             "category": "Furniture",
             "price": 499.99,
             "cost": 200.00,
-            "stock_quantity": 30
-        }
+            "stock_quantity": 30,
+        },
     ]
 
     products = []
@@ -248,11 +251,11 @@ def seed_products(db: Session):
         product = Product(**data)
         db.add(product)
         products.append(product)
-    
+
     db.commit()
     for product in products:
         db.refresh(product)
-    
+
     print(f"Seeded {len(products)} products")
     return products
 
@@ -261,10 +264,10 @@ def seed_orders(db: Session, customers: list, products: list):
     """Seed orders table with sample data."""
     regions = ["North", "South", "East", "West", "Central"]
     statuses = ["completed", "pending", "shipped", "cancelled"]
-    
+
     orders = []
     order_counter = 1000
-    
+
     # Generate 50 orders
     for i in range(50):
         customer = random.choice(customers)
@@ -272,11 +275,11 @@ def seed_orders(db: Session, customers: list, products: list):
         quantity = random.randint(1, 5)
         unit_price = product.price
         total_amount = quantity * unit_price
-        
+
         # Random date within last 6 months
         days_ago = random.randint(0, 180)
         order_date = datetime.now() - timedelta(days=days_ago)
-        
+
         order = Order(
             order_number=f"ORD-{order_counter + i}",
             customer_id=customer.id,
@@ -286,11 +289,11 @@ def seed_orders(db: Session, customers: list, products: list):
             total_amount=total_amount,
             order_date=order_date,
             status=random.choice(statuses),
-            region=random.choice(regions)
+            region=random.choice(regions),
         )
         db.add(order)
         orders.append(order)
-    
+
     db.commit()
     print(f"Seeded {len(orders)} orders")
 
@@ -300,21 +303,21 @@ def seed_all():
     db = SessionLocal()
     try:
         print("Starting database seeding...")
-        
+
         # Clear existing data
         print("Clearing existing data...")
         db.query(Order).delete()
         db.query(Product).delete()
         db.query(Customer).delete()
         db.commit()
-        
+
         # Seed data
         customers = seed_customers(db)
         products = seed_products(db)
         seed_orders(db, customers, products)
-        
+
         print("Database seeding completed successfully!")
-        
+
     except Exception as e:
         print(f"Error seeding database: {e}")
         db.rollback()

@@ -6,11 +6,14 @@ from app.database.config import Base
 
 class Order(Base):
     """Order model for retail analytics."""
+
     __tablename__ = "orders"
 
     id = Column(Integer, primary_key=True, index=True)
     order_number = Column(String(50), unique=True, nullable=False, index=True)
-    customer_id = Column(Integer, ForeignKey("customers.id"), nullable=False, index=True)
+    customer_id = Column(
+        Integer, ForeignKey("customers.id"), nullable=False, index=True
+    )
     product_id = Column(Integer, ForeignKey("products.id"), nullable=False, index=True)
     quantity = Column(Integer, nullable=False)
     unit_price = Column(Float, nullable=False)
