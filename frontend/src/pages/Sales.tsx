@@ -5,7 +5,7 @@ import Table from '../components/ui/Table';
 import Filter from '../components/ui/Filter';
 import DateRangePicker from '../components/ui/DateRangePicker';
 import Loading from '../components/ui/Loading';
-import ExportDropdown from '../components/ui/ExportDropdown';
+import HeaderActions from '../components/ui/HeaderActions';
 import { RefreshCw, TrendingUp } from 'lucide-react';
 import { exportToCSV, exportToExcel, generateFilename, ExportData } from '../utils/export';
 
@@ -39,7 +39,7 @@ const Sales: React.FC = () => {
         setMonthlySales(monthly);
         setCategorySales(category);
         setRegionalSales(regional);
-        setOrders(ordersData);
+        setOrders(ordersData.items);
       } catch (err) {
         setError('Failed to load sales data. Please try again later.');
         console.error('Error fetching sales data:', err);
@@ -81,7 +81,7 @@ const Sales: React.FC = () => {
         setMonthlySales(monthly);
         setCategorySales(category);
         setRegionalSales(regional);
-        setOrders(ordersData);
+        setOrders(ordersData.items);
       } catch (err) {
         setError('Failed to load sales data. Please try again later.');
         console.error('Error fetching sales data:', err);
@@ -235,32 +235,49 @@ const Sales: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Sales Analytics</h1>
-          <p className="text-gray-600 mt-1">Comprehensive sales performance analysis</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Sales Analytics</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Comprehensive sales performance analysis</p>
         </div>
-        <div className="flex space-x-2">
-          <ExportDropdown
-            onExportCSV={handleExportCSV}
-            onExportExcel={handleExportExcel}
-            disabled={filteredOrders.length === 0}
-          />
-          <button
-            onClick={handleRefresh}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-        </div>
+        <HeaderActions
+          actions={[
+            {
+              type: 'export-dropdown',
+              label: 'Export',
+              onClick: () => {},
+              disabled: filteredOrders.length === 0,
+              disabledTooltip: 'No data available to export',
+              exportFormats: [
+                {
+                  type: 'csv',
+                  label: 'Export as CSV',
+                  onClick: handleExportCSV,
+                },
+                {
+                  type: 'excel',
+                  label: 'Export as Excel',
+                  onClick: handleExportExcel,
+                },
+              ],
+            },
+            {
+              type: 'refresh',
+              icon: <RefreshCw className="w-4 h-4" />,
+              label: 'Refresh',
+              onClick: handleRefresh,
+              loading,
+            },
+          ]}
+          className="w-full sm:w-auto"
+        />
       </div>
 
       <Card>
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Filters</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Filters</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <DateRangePicker
               startDate={dateRange.startDate}
               endDate={dateRange.endDate}

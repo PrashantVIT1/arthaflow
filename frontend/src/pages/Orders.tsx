@@ -1,20 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { ordersApi, Order } from '../services/api';
+import { ordersApi, PaginatedOrdersResponse } from '../services/api';
 import Card from '../components/ui/Card';
 import Loading from '../components/ui/Loading';
+import HeaderActions from '../components/ui/HeaderActions';
+import Pagination from '../components/ui/Pagination';
 import { RefreshCw, Download, Package } from 'lucide-react';
+import { exportToCSV, generateFilename } from '../utils/export';
 
 const Orders: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [paginatedData, setPaginatedData] = useState<PaginatedOrdersResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (page: number = currentPage, size: number = rowsPerPage) => {
     try {
       setLoading(true);
       setError(null);
-      const data = await ordersApi.getAll();
-      setOrders(data);
+      const data = await ordersApi.getAll(page, size);
+      setPaginatedData(data);
     } catch (err) {
       setError('Failed to load orders. Please try again later.');
       console.error('Error fetching orders:', err);
@@ -25,14 +30,14 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     fetchOrders();
-    
+
     // Listen for ETL completion event to refresh data
     const handleETLCompleted = () => {
       fetchOrders();
     };
-    
+
     window.addEventListener('etl-completed', handleETLCompleted);
-    
+
     return () => {
       window.removeEventListener('etl-completed', handleETLCompleted);
     };
@@ -40,13 +45,41 @@ const Orders: React.FC = () => {
 
   const handleExport = async () => {
     try {
-      await ordersApi.exportOrders();
+      // Fetch all orders for export (not just current page)
+      const allData = await ordersApi.getAll(1, 10000);
+      const headers = ['S.No.', 'Order Number', 'Customer ID', 'Product ID', 'Quantity', 'Unit Price', 'Total Amount', 'Order Date', 'Status', 'Region'];
+      const rows = allData.items.map((order, index) => [
+        index + 1,
+        order.order_number,
+        order.customer_id,
+        order.product_id,
+        order.quantity,
+        order.unit_price.toFixed(2),
+        order.total_amount.toFixed(2),
+        new Date(order.order_date).toLocaleDateString(),
+        order.status,
+        order.region || '-'
+      ]);
+
+      const filename = generateFilename('orders', 'csv');
+      exportToCSV({ headers, rows }, filename);
     } catch (err) {
       console.error('Error exporting orders:', err);
     }
   };
 
-  if (loading && orders.length === 0) {
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    fetchOrders(page, rowsPerPage);
+  };
+
+  const handleRowsPerPageChange = (rows: number) => {
+    setRowsPerPage(rows);
+    setCurrentPage(1);
+    fetchOrders(1, rows);
+  };
+
+  if (loading && !paginatedData) {
     return <Loading text="Loading orders..." />;
   }
 
@@ -58,7 +91,7 @@ const Orders: React.FC = () => {
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Orders</h2>
           <p className="text-gray-600 mb-4">{error}</p>
           <button
-            onClick={fetchOrders}
+            onClick={() => fetchOrders()}
             className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retry
@@ -69,44 +102,47 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-          <p className="text-gray-600 mt-1">View and manage all orders</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Orders</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">View and manage imported customer orders</p>
         </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={handleExport}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span>Export CSV</span>
-          </button>
-          <button
-            onClick={fetchOrders}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-        </div>
+        <HeaderActions
+          actions={[
+            {
+              type: 'export',
+              icon: <Download className="w-4 h-4" />,
+              label: 'Export CSV',
+              onClick: handleExport,
+            },
+            {
+              type: 'refresh',
+              icon: <RefreshCw className="w-4 h-4" />,
+              label: 'Refresh',
+              onClick: () => fetchOrders(currentPage, rowsPerPage),
+              loading,
+            },
+          ]}
+          className="w-full sm:w-auto"
+        />
       </div>
 
-      {orders.length === 0 ? (
+      {!paginatedData || paginatedData.items.length === 0 ? (
         <Card>
-          <div className="text-center py-12">
-            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Orders Found</h3>
-            <p className="text-gray-600">There are no orders to display. Import data to get started.</p>
+          <div className="text-center py-8 sm:py-12">
+            <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2">No Orders Found</h3>
+            <p className="text-sm sm:text-base text-gray-600">There are no orders to display. Import data to get started.</p>
           </div>
         </Card>
       ) : (
         <Card>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
             <table className="min-w-full">
               <thead>
                 <tr className="border-b border-gray-200">
+                  <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">S.No.</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Order Number</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Customer ID</th>
                   <th className="text-left py-3 px-4 text-sm font-medium text-gray-600">Product ID</th>
@@ -119,8 +155,9 @@ const Orders: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+                {paginatedData.items.map((order, index) => (
                   <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
+                    <td className="py-3 px-4 text-sm text-gray-900">{(currentPage - 1) * rowsPerPage + index + 1}</td>
                     <td className="py-3 px-4 text-sm font-medium text-gray-900">{order.order_number}</td>
                     <td className="py-3 px-4 text-sm text-gray-600">{order.customer_id}</td>
                     <td className="py-3 px-4 text-sm text-gray-600">{order.product_id}</td>
@@ -143,6 +180,15 @@ const Orders: React.FC = () => {
               </tbody>
             </table>
           </div>
+          <Pagination
+            currentPage={currentPage}
+            totalPages={paginatedData.total_pages}
+            totalItems={paginatedData.total_elements}
+            rowsPerPage={rowsPerPage}
+            onPageChange={handlePageChange}
+            onRowsPerPageChange={handleRowsPerPageChange}
+            itemName="Orders"
+          />
         </Card>
       )}
     </div>

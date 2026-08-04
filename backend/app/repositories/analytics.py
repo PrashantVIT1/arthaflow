@@ -56,7 +56,7 @@ class AnalyticsRepository:
         
         # Calculate profit (need to join with products)
         profit_query = self.db.query(
-            func.sum((Order.unit_price - Product.cost) * Order.quantity)
+            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity)
         ).join(Product, Order.product_id == Product.id)
         
         if start_date:
@@ -100,7 +100,7 @@ class AnalyticsRepository:
             extract('month', Order.order_date).label('month'),
             func.sum(Order.total_amount).label('revenue'),
             func.count(Order.id).label('orders'),
-            func.sum((Order.unit_price - Product.cost) * Order.quantity).label('profit')
+            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label('profit')
         ).join(Product, Order.product_id == Product.id)
         
         # Apply filters
@@ -157,7 +157,7 @@ class AnalyticsRepository:
             Product.category,
             func.sum(Order.total_amount).label('revenue'),
             func.count(Order.id).label('orders'),
-            func.sum((Order.unit_price - Product.cost) * Order.quantity).label('profit')
+            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label('profit')
         ).join(Product, Order.product_id == Product.id)
         
         # Apply filters
@@ -202,7 +202,7 @@ class AnalyticsRepository:
             Order.region,
             func.sum(Order.total_amount).label('revenue'),
             func.count(Order.id).label('orders'),
-            func.sum((Order.unit_price - Product.cost) * Order.quantity).label('profit')
+            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label('profit')
         ).join(Product, Order.product_id == Product.id)
         
         # Apply filters
@@ -251,7 +251,7 @@ class AnalyticsRepository:
             Product.category,
             func.sum(Order.quantity).label('quantity_sold'),
             func.sum(Order.total_amount).label('revenue'),
-            func.sum((Order.unit_price - Product.cost) * Order.quantity).label('profit')
+            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label('profit')
         ).join(Order, Order.product_id == Product.id)
         
         # Apply filters

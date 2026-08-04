@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="frontend/public/assets/logo/logo-full.svg" alt="ArthaFlow Logo" width="200" height="40">
+</div>
+
 # ArthaFlow
 
 ArthaFlow is an Enterprise ETL & Business Analytics Platform for importing, transforming, analyzing, and visualizing business data through interactive dashboards and automated data pipelines.

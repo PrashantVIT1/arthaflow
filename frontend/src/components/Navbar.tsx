@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Search, Bell, Menu, X, ChevronDown } from 'lucide-react';
 import { format } from 'date-fns';
+import Phase2Dialog, { Phase2FeatureConfig } from './ui/Phase2Dialog';
 
 interface NavbarProps {
   onMenuClick: () => void;
@@ -13,6 +14,22 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, isSidebarOpen, sidebarColl
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showNotificationDialog, setShowNotificationDialog] = useState(false);
+
+  const notificationConfig: Phase2FeatureConfig = {
+    title: 'Notifications',
+    description: 'This feature is planned for Phase 2 of the project.',
+    plannedFeatures: [
+      'Real-time notifications',
+      'Data Pipeline status updates',
+      'Sales & Order alerts',
+      'Report generation notifications',
+      'User activity timeline',
+      'System alerts',
+    ],
+    icon: 'info',
+    buttonText: 'Close',
+  };
 
   const getPageTitle = (pathname: string) => {
     const titles: Record<string, string> = {
@@ -21,6 +38,7 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, isSidebarOpen, sidebarColl
       '/products': 'Products',
       '/customers': 'Customers',
       '/reports': 'Reports',
+      '/developer-profile': 'Developer Profile',
       '/settings': 'Settings',
     };
     return titles[pathname] || 'Dashboard';
@@ -84,7 +102,10 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, isSidebarOpen, sidebarColl
               {format(new Date(), 'MMM dd, yyyy')}
             </div>
 
-            <button className="p-2 rounded-full text-gray-500 hover:bg-gray-100 relative">
+            <button 
+              onClick={() => setShowNotificationDialog(true)}
+              className="p-2 rounded-full text-gray-500 hover:bg-gray-100 relative"
+            >
               <Bell className="w-6 h-6" />
               <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full"></span>
             </button>
@@ -123,6 +144,12 @@ const Navbar: React.FC<NavbarProps> = ({ onMenuClick, isSidebarOpen, sidebarColl
           </div>
         </div>
       </div>
+
+      <Phase2Dialog
+        isOpen={showNotificationDialog}
+        onClose={() => setShowNotificationDialog(false)}
+        config={notificationConfig}
+      />
     </nav>
   );
 };

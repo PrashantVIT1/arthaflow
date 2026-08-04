@@ -1,42 +1,66 @@
 """API routes for order endpoints."""
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+from typing import Optional
 import csv
 import io
 from app.database.config import get_db
 from app.models.order import Order
+from app.schemas.order import OrderResponse
+from app.schemas.pagination import PaginatedResponse
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
 
-@router.get("")
-def get_orders(db: Session = Depends(get_db)):
+@router.get("", response_model=PaginatedResponse[OrderResponse])
+def get_orders(
+    page: int = Query(1, ge=1, description="Page number (starts from 1)"),
+    size: int = Query(10, ge=1, le=10000, description="Number of items per page"),
+    db: Session = Depends(get_db)
+):
     """
-    Get all orders.
-    
+    Get orders with server-side pagination.
+
+    Args:
+        page: Page number (1-indexed)
+        size: Number of items per page (max 100)
+        db: Database session
+
     Returns:
-        List of orders with all details
+        Paginated response with orders and metadata
     """
     try:
-        orders = db.query(Order).all()
-        return [
-            {
-                "id": order.id,
-                "order_number": order.order_number,
-                "customer_id": order.customer_id,
-                "product_id": order.product_id,
-                "quantity": order.quantity,
-                "unit_price": order.unit_price,
-                "total_amount": order.total_amount,
-                "order_date": order.order_date.isoformat() if order.order_date else None,
-                "status": order.status,
-                "region": order.region,
-                "created_at": order.created_at.isoformat() if order.created_at else None,
-                "updated_at": order.updated_at.isoformat() if order.updated_at else None
-            }
-            for order in orders
-        ]
+        # Get total count
+        total_elements = db.query(Order).count()
+
+        # Calculate pagination metadata
+        total_pages = (total_elements + size - 1) // size if total_elements > 0 else 0
+        has_next = page < total_pages
+        has_previous = page > 1
+        first_page = page == 1
+        last_page = page == total_pages or total_pages == 0
+
+        # Query with offset and limit (database-level pagination)
+        orders = (
+            db.query(Order)
+            .order_by(Order.id)
+            .offset((page - 1) * size)
+            .limit(size)
+            .all()
+        )
+
+        return {
+            "items": orders,
+            "current_page": page,
+            "page_size": size,
+            "total_elements": total_elements,
+            "total_pages": total_pages,
+            "has_next": has_next,
+            "has_previous": has_previous,
+            "first_page": first_page,
+            "last_page": last_page
+        }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

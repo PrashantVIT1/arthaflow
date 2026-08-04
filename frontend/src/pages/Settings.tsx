@@ -4,10 +4,10 @@ import { Settings as SettingsIcon, Moon, Sun, Bell, Shield, Info, Zap, Lock, Glo
 
 const Settings: React.FC = () => {
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your application preferences</p>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Settings</h1>
+        <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage your application preferences</p>
       </div>
 
       <Card title="Theme Settings" subtitle="Customize the appearance of the application">

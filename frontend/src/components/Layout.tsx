@@ -29,11 +29,11 @@ const Layout: React.FC = () => {
         sidebarCollapsed={sidebarCollapsed}
       />
       <main
-        className={`pt-16 p-6 transition-all duration-300 ${
+        className={`pt-16 md:pt-16 lg:pt-20 px-3 sm:px-4 lg:px-6 py-3 sm:py-4 lg:py-6 transition-all duration-300 ${
           sidebarCollapsed ? 'lg:ml-16' : 'lg:ml-64'
         }`}
       >
-        <div className="max-w-7xl mx-auto">
+        <div className="w-full max-w-7xl mx-auto">
           <Outlet />
         </div>
       </main>

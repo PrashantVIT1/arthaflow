@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import HeaderActions from '../components/ui/HeaderActions';
+import Phase2Dialog, { Phase2FeatureConfig } from '../components/ui/Phase2Dialog';
 import { Download, FileText, Calendar, TrendingUp, Package, Users, DollarSign } from 'lucide-react';
 
 interface Report {
@@ -13,6 +15,23 @@ interface Report {
 }
 
 const Reports: React.FC = () => {
+  const [showReportDialog, setShowReportDialog] = useState(false);
+
+  const reportConfig: Phase2FeatureConfig = {
+    title: 'Report Generation',
+    description: 'Report generation will be available in Phase 2 of the project.',
+    plannedFeatures: [
+      'CSV Export',
+      'Excel Export',
+      'PDF Reports',
+      'Scheduled Reports',
+      'Custom Date Range Reports',
+      'Automated Report Delivery',
+    ],
+    icon: 'report',
+    buttonText: 'Close',
+  };
+
   const downloadHistory = [
     { id: 1, name: 'Sales Report - Monthly', date: '2024-01-15', format: 'CSV' },
     { id: 2, name: 'Product Performance Report', date: '2024-01-14', format: 'PDF' },
@@ -71,37 +90,46 @@ const Reports: React.FC = () => {
     },
   ];
 
-  const handleGenerateReport = (reportId: number) => {
-    alert(`Generating report ${reportId}... (This is a Phase 1 placeholder)`);
+  const handleGenerateReport = (_reportId: number) => {
+    setShowReportDialog(true);
   };
 
   const handleExportCSV = () => {
-    alert('Exporting CSV... (This is a Phase 1 placeholder)');
+    setShowReportDialog(true);
   };
 
   const handleExportPDF = () => {
-    alert('Exporting PDF... (This is a Phase 1 placeholder)');
+    setShowReportDialog(true);
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
-          <p className="text-gray-600 mt-1">Generate and download analytics reports</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Reports</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Generate and download analytics reports</p>
         </div>
-        <div className="flex space-x-3">
-          <Button variant="outline" icon={<Download className="w-4 h-4" />} onClick={handleExportCSV}>
-            Export CSV
-          </Button>
-          <Button variant="outline" icon={<Download className="w-4 h-4" />} onClick={handleExportPDF}>
-            Export PDF
-          </Button>
-        </div>
+        <HeaderActions
+          actions={[
+            {
+              type: 'export',
+              icon: <Download className="w-4 h-4" />,
+              label: 'Export CSV',
+              onClick: handleExportCSV,
+            },
+            {
+              type: 'export',
+              icon: <Download className="w-4 h-4" />,
+              label: 'Export PDF',
+              onClick: handleExportPDF,
+            },
+          ]}
+          className="w-full sm:w-auto"
+        />
       </div>
 
       <Card title="Available Reports" subtitle="Select a report to generate">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {reports.map((report) => (
             <div
               key={report.id}
@@ -200,6 +228,12 @@ const Reports: React.FC = () => {
           </div>
         </div>
       </Card>
+
+      <Phase2Dialog
+        isOpen={showReportDialog}
+        onClose={() => setShowReportDialog(false)}
+        config={reportConfig}
+      />
     </div>
   );
 };

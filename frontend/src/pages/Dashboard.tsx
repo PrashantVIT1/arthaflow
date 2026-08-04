@@ -11,6 +11,7 @@ import Filter from '../components/ui/Filter';
 import DateRangePicker from '../components/ui/DateRangePicker';
 import EmptyState from '../components/ui/EmptyState';
 import Loading from '../components/ui/Loading';
+import HeaderActions from '../components/ui/HeaderActions';
 import { RefreshCw, Download } from 'lucide-react';
 
 const Dashboard: React.FC = () => {
@@ -140,34 +141,36 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-600 mt-1">Key performance metrics and analytics</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Dashboard Overview</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Key performance metrics and analytics</p>
         </div>
-        <div className="flex space-x-2">
-          <button
-            onClick={handleExport}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Download className="w-4 h-4" />
-            <span>Export</span>
-          </button>
-          <button
-            onClick={handleRefresh}
-            className="flex items-center space-x-2 px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            <span>Refresh</span>
-          </button>
-        </div>
+        <HeaderActions
+          actions={[
+            {
+              type: 'export',
+              icon: <Download className="w-4 h-4" />,
+              label: 'Export',
+              onClick: handleExport,
+            },
+            {
+              type: 'refresh',
+              icon: <RefreshCw className="w-4 h-4" />,
+              label: 'Refresh',
+              onClick: handleRefresh,
+              loading,
+            },
+          ]}
+          className="w-full sm:w-auto"
+        />
       </div>
 
       <Card>
-        <div className="p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Global Filters</h3>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Global Filters</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <DateRangePicker
               startDate={dateRange.startDate}
               endDate={dateRange.endDate}
@@ -203,12 +206,12 @@ const Dashboard: React.FC = () => {
         </Card>
       ) : (
         <>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <MonthlySalesChart data={data.monthly_sales} loading={loading} />
             <CategorySalesChart data={data.category_sales} loading={loading} />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             <RegionalSalesChart data={data.regional_sales} loading={loading} />
             <ProductDistributionPieChart data={pieChartData} loading={loading} />
           </div>

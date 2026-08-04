@@ -354,15 +354,15 @@ const DataPipeline: React.FC = () => {
     }
   };
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Data Pipeline</h1>
-          <p className="text-gray-600 mt-1">Manage data ingestion and ETL processes</p>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="w-full sm:w-auto">
+          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Data Pipeline</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">Manage data ingestion and ETL processes</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <Card title="Dataset Source" subtitle="Configure data source connections">
           <div className="space-y-4">
             <div className="flex items-center space-x-3">

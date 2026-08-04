@@ -195,15 +195,27 @@ export interface Order {
   updated_at: string;
 }
 
+export interface PaginatedOrdersResponse {
+  items: Order[];
+  current_page: number;
+  page_size: number;
+  total_elements: number;
+  total_pages: number;
+  has_next: boolean;
+  has_previous: boolean;
+  first_page: boolean;
+  last_page: boolean;
+}
+
 export const ordersApi = {
-  getAll: async (): Promise<Order[]> => {
-    const response = await api.get('/orders');
+  getAll: async (page: number = 1, size: number = 10000): Promise<PaginatedOrdersResponse> => {
+    const response = await api.get('/orders', { params: { page, size } });
     return response.data;
   },
 
   exportOrders: async (): Promise<void> => {
     const response = await api.get('/orders/export', { responseType: 'blob' });
-    
+
     const blob = new Blob([response.data], { type: 'text/csv' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
