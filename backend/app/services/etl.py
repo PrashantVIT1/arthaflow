@@ -1,21 +1,16 @@
 """Service layer for ETL operations."""
 
 import os
-import pandas as pd
-from typing import Dict, Any, List
 from datetime import datetime
-from app.schemas.etl import (
-    ETLRunRequest,
-    ETLRunResponse,
-    ETLStatus,
-    ETLLogEntry,
-    ETLLogsResponse,
-    ETLState,
-    ArchiveModeVerifyResponse,
-)
-from app.database.config import get_engine
+from typing import Any, Dict, List
+
+import pandas as pd
 from sqlalchemy import text
 
+from app.database.config import get_engine
+from app.schemas.etl import (ArchiveModeVerifyResponse, ETLLogEntry,
+                             ETLLogsResponse, ETLRunRequest, ETLRunResponse,
+                             ETLState, ETLStatus)
 
 # Global state for ETL status and logs (in-memory for simplicity)
 etl_status = {

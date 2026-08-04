@@ -5,6 +5,7 @@ Run this from the backend directory to execute the ETL pipeline.
 
 import sys
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file

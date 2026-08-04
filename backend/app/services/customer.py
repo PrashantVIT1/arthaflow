@@ -1,8 +1,10 @@
 """Service for customer operations."""
 
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 from typing import List, Optional
+
+from sqlalchemy import text
+from sqlalchemy.orm import Session
+
 from app.schemas.customer import CustomerResponse
 
 

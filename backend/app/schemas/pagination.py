@@ -1,7 +1,8 @@
 """Schemas for pagination operations."""
 
+from typing import Generic, List, TypeVar
+
 from pydantic import BaseModel
-from typing import List, TypeVar, Generic
 
 T = TypeVar("T")
 

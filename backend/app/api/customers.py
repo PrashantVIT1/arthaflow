@@ -1,14 +1,16 @@
 """API routes for customer endpoints."""
 
+import csv
+import io
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from typing import List
-import csv
-import io
+
 from app.database.config import get_db
-from app.services.customer import CustomerService
 from app.schemas.customer import CustomerResponse
+from app.services.customer import CustomerService
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 

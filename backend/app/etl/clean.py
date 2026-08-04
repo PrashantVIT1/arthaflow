@@ -1,7 +1,9 @@
 """Clean module for data cleaning."""
 
-import pandas as pd
 from typing import Dict, Optional
+
+import pandas as pd
+
 from app.etl.config import ETLConfig
 
 

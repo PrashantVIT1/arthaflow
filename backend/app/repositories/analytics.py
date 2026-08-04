@@ -1,10 +1,12 @@
 """Repository layer for analytics queries."""
 
-from sqlalchemy.orm import Session
-from sqlalchemy import func, extract
-from app.models import Order, Customer, Product
-from typing import List, Dict, Any
+from typing import Any, Dict, List
+
 import pandas as pd
+from sqlalchemy import extract, func
+from sqlalchemy.orm import Session
+
+from app.models import Customer, Order, Product
 
 
 class AnalyticsRepository:

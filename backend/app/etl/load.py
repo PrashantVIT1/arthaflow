@@ -1,10 +1,12 @@
 """Load module for loading data into PostgreSQL."""
 
-import pandas as pd
 from typing import Dict, Optional
+
+import pandas as pd
 from sqlalchemy import create_engine, text
-from app.etl.config import ETLConfig
+
 from app.database.config import get_engine
+from app.etl.config import ETLConfig
 
 
 class Loader:

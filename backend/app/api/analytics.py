@@ -1,20 +1,17 @@
 """API routes for analytics endpoints."""
 
+import csv
+import io
+from typing import List, Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-from typing import List, Optional
-import csv
-import io
+
 from app.database.config import get_db
+from app.schemas.analytics import (CategorySales, DashboardResponse,
+                                   MonthlySales, RegionalSales, TopProduct)
 from app.services.analytics import AnalyticsService
-from app.schemas.analytics import (
-    DashboardResponse,
-    MonthlySales,
-    CategorySales,
-    RegionalSales,
-    TopProduct,
-)
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 

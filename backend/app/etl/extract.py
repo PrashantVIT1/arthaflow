@@ -1,8 +1,10 @@
 """Extract module for reading CSV files."""
 
-import pandas as pd
 from pathlib import Path
 from typing import Dict, Optional
+
+import pandas as pd
+
 from app.etl.config import ETLConfig
 
 

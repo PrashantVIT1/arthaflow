@@ -1,17 +1,18 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
-from dotenv import load_dotenv
 
 # Load environment variables BEFORE importing database config
 load_dotenv()
 
-from app.database.config import get_engine, Base
 from app.api.analytics import router as analytics_router
-from app.api.pipeline import router as pipeline_router
-from app.api.etl import router as etl_router
 from app.api.customers import router as customers_router
+from app.api.etl import router as etl_router
 from app.api.orders import router as orders_router
+from app.api.pipeline import router as pipeline_router
+from app.database.config import Base, get_engine
 
 app = FastAPI(
     title="ArthaFlow API",

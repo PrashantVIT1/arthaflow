@@ -3,8 +3,9 @@ Seed data script for retail analytics platform.
 Run this script to populate the database with sample data.
 """
 
-from dotenv import load_dotenv
 import os
+
+from dotenv import load_dotenv
 
 # Load environment variables BEFORE importing database config
 load_dotenv()
@@ -15,11 +16,13 @@ if not os.getenv("DATABASE_URL"):
         "postgresql://postgres:1234567890@localhost:5432/insightflow"
     )
 
-from sqlalchemy.orm import Session
-from app.database.config import engine, SessionLocal
-from app.models import Customer, Product, Order
 import random
 from datetime import datetime, timedelta
+
+from sqlalchemy.orm import Session
+
+from app.database.config import SessionLocal, engine
+from app.models import Customer, Order, Product
 
 
 def seed_customers(db: Session):

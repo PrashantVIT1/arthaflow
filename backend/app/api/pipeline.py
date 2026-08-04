@@ -1,8 +1,9 @@
 """API routes for data pipeline endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException
-from app.services.pipeline import PipelineService
+
 from app.schemas.pipeline import SampleDatasetMetadata
+from app.services.pipeline import PipelineService
 
 router = APIRouter(prefix="/pipeline", tags=["pipeline"])
 

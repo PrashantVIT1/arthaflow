@@ -4,8 +4,9 @@ Simple script to run SQL queries against the database.
 
 import sys
 from pathlib import Path
-from dotenv import load_dotenv
+
 import pandas as pd
+from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 
 # Load environment variables

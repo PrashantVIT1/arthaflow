@@ -1,7 +1,9 @@
 """Validate module for data validation."""
 
-import pandas as pd
 from typing import Dict, List, Tuple
+
+import pandas as pd
+
 from app.etl.config import ETLConfig
 
 

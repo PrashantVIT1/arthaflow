@@ -1,6 +1,7 @@
-from logging.config import fileConfig
 import sys
+from logging.config import fileConfig
 from pathlib import Path
+
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -10,9 +11,7 @@ load_dotenv(env_path)
 # Add the backend directory to Python path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from sqlalchemy import MetaData
+from sqlalchemy import MetaData, engine_from_config, pool
 
 from alembic import context
 

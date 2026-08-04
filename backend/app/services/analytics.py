@@ -1,16 +1,13 @@
 """Service layer for analytics business logic."""
 
-from sqlalchemy.orm import Session
 from typing import List
+
+from sqlalchemy.orm import Session
+
 from app.repositories.analytics import AnalyticsRepository
-from app.schemas.analytics import (
-    DashboardKPI,
-    MonthlySales,
-    CategorySales,
-    RegionalSales,
-    TopProduct,
-    DashboardResponse,
-)
+from app.schemas.analytics import (CategorySales, DashboardKPI,
+                                   DashboardResponse, MonthlySales,
+                                   RegionalSales, TopProduct)
 
 
 class AnalyticsService:
