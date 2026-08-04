@@ -1,6 +1,11 @@
-from app.schemas.analytics import (CategorySales, DashboardKPI,
-                                   DashboardResponse, MonthlySales,
-                                   RegionalSales, TopProduct)
+from app.schemas.analytics import (
+    CategorySales,
+    DashboardKPI,
+    DashboardResponse,
+    MonthlySales,
+    RegionalSales,
+    TopProduct,
+)
 
 __all__ = [
     "DashboardKPI",

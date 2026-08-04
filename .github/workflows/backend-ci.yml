@@ -33,13 +33,13 @@ jobs:
 
       - name: Install Testing Tools
         run: |
-          pip install pytest flake8 black isort
-
-      - name: Run Black
-        run: black --check .
+          pip install pytest flake8==7.1.0 black==24.4.2 isort==5.13.2
 
       - name: Run isort
         run: isort --check-only .
+
+      - name: Run Black
+        run: black --check .
 
       - name: Run Flake8
         run: flake8 .
