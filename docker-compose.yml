@@ -1,0 +1,61 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: arthaflow-db
+
+    restart: always
+
+    environment:
+      POSTGRES_DB: arthaflow
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1234567890
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+
+    container_name: arthaflow-api
+
+    depends_on:
+      - postgres
+
+    ports:
+      - "8000:8000"
+
+    env_file:
+      - ./backend/.env
+
+    volumes:
+      - ./backend:/app
+
+  frontend:
+    build: ./frontend
+
+    container_name: arthaflow-ui
+
+    depends_on:
+      - backend
+
+    ports:
+      - "5173:5173"
+
+    environment:
+      VITE_API_URL: http://localhost:8000
+
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    
+    env_file:
+      - ./frontend/.env
+
+volumes:
+  postgres_data:
