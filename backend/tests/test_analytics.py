@@ -179,7 +179,9 @@ def test_analytics_service_get_monthly_sales_calls_repository(mock_db_session):
     mock_repo.get_monthly_sales.assert_called_once()
 
 
-def test_analytics_repository_get_dashboard_kpis_returns_dict_structure(mock_db_session):
+def test_analytics_repository_get_dashboard_kpis_returns_dict_structure(
+    mock_db_session,
+):
     """Test that AnalyticsRepository returns a dictionary with correct keys."""
     from app.repositories.analytics import AnalyticsRepository
 

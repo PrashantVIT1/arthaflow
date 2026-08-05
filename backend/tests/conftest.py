@@ -1,12 +1,12 @@
 """Pytest configuration and fixtures for ArthaFlow backend tests."""
 
 import os
+from unittest.mock import MagicMock
 
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from unittest.mock import MagicMock
 
 # Set test environment variables before importing app
 os.environ["DATABASE_URL"] = "sqlite:///:memory:"
