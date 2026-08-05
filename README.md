@@ -125,6 +125,58 @@ npm run dev
 
 The frontend will be available at `http://localhost:5173`
 
+## Running Tests
+
+The backend includes a comprehensive test suite using pytest. Tests are located in the `backend/tests/` directory.
+
+### Running All Tests
+
+From the backend directory:
+
+```bash
+pytest
+```
+
+Or from the project root:
+
+```bash
+pytest backend/tests/
+```
+
+### Running Specific Test Files
+
+```bash
+# Test a specific file
+pytest tests/test_analytics.py
+
+# Test multiple files
+pytest tests/test_analytics.py tests/test_orders.py
+```
+
+### Running with Verbose Output
+
+```bash
+pytest -v
+```
+
+### Running Specific Tests
+
+```bash
+# Run a specific test function
+pytest tests/test_analytics.py::test_get_dashboard_returns_200
+
+# Run tests matching a pattern
+pytest -k "dashboard"
+```
+
+### Viewing Test Coverage
+
+```bash
+pytest --cov=app --cov-report=html
+```
+
+This generates an HTML coverage report in `htmlcov/index.html`.
+
 ## Architecture
 
 The project follows clean architecture principles:
