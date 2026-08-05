@@ -44,13 +44,7 @@ def get_orders(
         last_page = page == total_pages or total_pages == 0
 
         # Query with offset and limit (database-level pagination)
-        orders = (
-            db.query(Order)
-            .order_by(Order.id)
-            .offset((page - 1) * size)
-            .limit(size)
-            .all()
-        )
+        orders = db.query(Order).order_by(Order.id).offset((page - 1) * size).limit(size).all()
 
         return {
             "items": orders,

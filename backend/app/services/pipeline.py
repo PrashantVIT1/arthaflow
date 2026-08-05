@@ -27,16 +27,10 @@ class PipelineService:
 
         # Count rows in CSV files (excluding header)
         customers_count = (
-            self._count_csv_rows(customers_file)
-            if os.path.exists(customers_file)
-            else 0
+            self._count_csv_rows(customers_file) if os.path.exists(customers_file) else 0
         )
-        products_count = (
-            self._count_csv_rows(products_file) if os.path.exists(products_file) else 0
-        )
-        orders_count = (
-            self._count_csv_rows(orders_file) if os.path.exists(orders_file) else 0
-        )
+        products_count = self._count_csv_rows(products_file) if os.path.exists(products_file) else 0
+        orders_count = self._count_csv_rows(orders_file) if os.path.exists(orders_file) else 0
 
         return SampleDatasetMetadata(
             name="ArthaFlow Sample Dataset",

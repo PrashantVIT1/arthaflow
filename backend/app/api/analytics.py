@@ -322,9 +322,7 @@ def export_dashboard_csv(
         return StreamingResponse(
             io.BytesIO(output.getvalue().encode("utf-8")),
             media_type="text/csv",
-            headers={
-                "Content-Disposition": ('attachment; filename="dashboard_summary.csv"')
-            },
+            headers={"Content-Disposition": ('attachment; filename="dashboard_summary.csv"')},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
