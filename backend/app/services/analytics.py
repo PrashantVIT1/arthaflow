@@ -73,18 +73,10 @@ class AnalyticsService:
 
         return DashboardResponse(
             kpis=DashboardKPI(**kpis_data),
-            monthly_sales=[
-                MonthlySales(**data) for data in monthly_sales_data
-            ],
-            category_sales=[
-                CategorySales(**data) for data in category_sales_data
-            ],
-            regional_sales=[
-                RegionalSales(**data) for data in regional_sales_data
-            ],
-            top_products=[
-                TopProduct(**data) for data in top_products_data
-            ],
+            monthly_sales=[MonthlySales(**data) for data in monthly_sales_data],
+            category_sales=[CategorySales(**data) for data in category_sales_data],
+            regional_sales=[RegionalSales(**data) for data in regional_sales_data],
+            top_products=[TopProduct(**data) for data in top_products_data],
         )
 
     def get_monthly_sales(
@@ -134,10 +126,7 @@ class AnalyticsService:
         return [CategorySales(**item) for item in data]
 
     def get_regional_sales(
-        self,
-        start_date: str = None,
-        end_date: str = None,
-        category: str = None
+        self, start_date: str = None, end_date: str = None, category: str = None
     ) -> List[RegionalSales]:
         """
         Get sales by region.

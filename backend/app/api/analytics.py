@@ -4,6 +4,10 @@ import csv
 import io
 from typing import List, Optional
 
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
+
 from app.database.config import get_db
 from app.schemas.analytics import (
     CategorySales,
@@ -13,9 +17,6 @@ from app.schemas.analytics import (
     TopProduct,
 )
 from app.services.analytics import AnalyticsService
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
@@ -253,13 +254,9 @@ def export_dashboard_csv(
         writer.writerow(["Dashboard Summary"])
         writer.writerow([])
         writer.writerow(["Metric", "Value"])
-        writer.writerow(
-            ["Total Revenue", dashboard_data.kpis.total_revenue]
-        )
+        writer.writerow(["Total Revenue", dashboard_data.kpis.total_revenue])
         writer.writerow(["Total Orders", dashboard_data.kpis.total_orders])
-        writer.writerow(
-            ["Total Customers", dashboard_data.kpis.total_customers]
-        )
+        writer.writerow(["Total Customers", dashboard_data.kpis.total_customers])
         writer.writerow(["Total Profit", dashboard_data.kpis.total_profit])
         writer.writerow([])
 
@@ -284,9 +281,7 @@ def export_dashboard_csv(
         writer.writerow([])
         writer.writerow(["Category", "Revenue", "Orders", "Profit"])
         for item in dashboard_data.category_sales:
-            writer.writerow(
-                [item.category, item.revenue, item.orders, item.profit]
-            )
+            writer.writerow([item.category, item.revenue, item.orders, item.profit])
         writer.writerow([])
 
         # Write Regional Sales
@@ -294,9 +289,7 @@ def export_dashboard_csv(
         writer.writerow([])
         writer.writerow(["Region", "Revenue", "Orders", "Profit"])
         for item in dashboard_data.regional_sales:
-            writer.writerow(
-                [item.region, item.revenue, item.orders, item.profit]
-            )
+            writer.writerow([item.region, item.revenue, item.orders, item.profit])
         writer.writerow([])
 
         # Write Top Products
@@ -330,9 +323,7 @@ def export_dashboard_csv(
             io.BytesIO(output.getvalue().encode("utf-8")),
             media_type="text/csv",
             headers={
-                "Content-Disposition": (
-                    'attachment; filename="dashboard_summary.csv"'
-                )
+                "Content-Disposition": ('attachment; filename="dashboard_summary.csv"')
             },
         )
     except Exception as e:

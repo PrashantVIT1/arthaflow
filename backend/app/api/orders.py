@@ -17,12 +17,8 @@ router = APIRouter(prefix="/orders", tags=["orders"])
 
 @router.get("", response_model=PaginatedResponse[OrderResponse])
 def get_orders(
-    page: int = Query(
-        1, ge=1, description="Page number (starts from 1)"
-    ),
-    size: int = Query(
-        10, ge=1, le=10000, description="Number of items per page"
-    ),
+    page: int = Query(1, ge=1, description="Page number (starts from 1)"),
+    size: int = Query(10, ge=1, le=10000, description="Number of items per page"),
     db: Session = Depends(get_db),
 ):
     """
@@ -41,11 +37,7 @@ def get_orders(
         total_elements = db.query(Order).count()
 
         # Calculate pagination metadata
-        total_pages = (
-            (total_elements + size - 1) // size
-            if total_elements > 0
-            else 0
-        )
+        total_pages = (total_elements + size - 1) // size if total_elements > 0 else 0
         has_next = page < total_pages
         has_previous = page > 1
         first_page = page == 1
@@ -131,9 +123,7 @@ def export_orders_csv(db: Session = Depends(get_db)):
         return StreamingResponse(
             io.BytesIO(output.getvalue().encode("utf-8")),
             media_type="text/csv",
-            headers={
-                "Content-Disposition": 'attachment; filename="orders.csv"'
-            },
+            headers={"Content-Disposition": 'attachment; filename="orders.csv"'},
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

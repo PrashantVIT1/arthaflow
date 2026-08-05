@@ -68,9 +68,7 @@ class CustomerService:
                     city=row.city,
                     country=row.country,
                     total_orders=row.total_orders,
-                    total_spent=float(row.total_spent)
-                    if row.total_spent
-                    else 0.0,
+                    total_spent=float(row.total_spent) if row.total_spent else 0.0,
                     last_order_date=row.last_order_date,
                     created_at=row.created_at,
                     updated_at=row.updated_at,

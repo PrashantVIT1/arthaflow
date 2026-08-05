@@ -15,6 +15,7 @@ from app.models import Customer, Order, Product
 # Load environment variables
 load_dotenv()
 
+
 def seed_customers(db: Session):
     """Seed customers table with sample data."""
     customers_data = [

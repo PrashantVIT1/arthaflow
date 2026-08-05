@@ -36,9 +36,7 @@ class Cleaner:
 
         return df_cleaned
 
-    def handle_null_values(
-        self, df: pd.DataFrame, table_name: str
-    ) -> pd.DataFrame:
+    def handle_null_values(self, df: pd.DataFrame, table_name: str) -> pd.DataFrame:
         """
         Handle null values in DataFrame.
 
@@ -58,9 +56,7 @@ class Cleaner:
                 null_count = df_cleaned[col].isnull().sum()
                 if null_count > 0:
                     df_cleaned = df_cleaned.dropna(subset=[col])
-                    print(
-                        f"Dropped {null_count} rows with null values in {col}"
-                    )
+                    print(f"Dropped {null_count} rows with null values in {col}")
 
         # Fill null values in optional columns with defaults
         if table_name == "orders":
@@ -81,15 +77,11 @@ class Cleaner:
 
         elif table_name == "products":
             if "description" in df_cleaned.columns:
-                df_cleaned["description"] = (
-                    df_cleaned["description"].fillna("")
-                )
+                df_cleaned["description"] = df_cleaned["description"].fillna("")
             if "cost" in df_cleaned.columns:
                 df_cleaned["cost"] = df_cleaned["cost"].fillna(0.0)
             if "stock_quantity" in df_cleaned.columns:
-                df_cleaned["stock_quantity"] = (
-                    df_cleaned["stock_quantity"].fillna(0)
-                )
+                df_cleaned["stock_quantity"] = df_cleaned["stock_quantity"].fillna(0)
 
         return df_cleaned
 
@@ -109,16 +101,12 @@ class Cleaner:
 
         for col in date_columns:
             if col in df_cleaned.columns:
-                df_cleaned[col] = pd.to_datetime(
-                    df_cleaned[col], errors="coerce"
-                )
+                df_cleaned[col] = pd.to_datetime(df_cleaned[col], errors="coerce")
                 print(f"Converted {col} to datetime")
 
         return df_cleaned
 
-    def clean_dataframe(
-        self, df: pd.DataFrame, table_name: str
-    ) -> pd.DataFrame:
+    def clean_dataframe(self, df: pd.DataFrame, table_name: str) -> pd.DataFrame:
         """
         Apply all cleaning operations to a DataFrame.
 
@@ -146,9 +134,7 @@ class Cleaner:
 
         return df_cleaned
 
-    def clean_all(
-        self, data: Dict[str, pd.DataFrame]
-    ) -> Dict[str, pd.DataFrame]:
+    def clean_all(self, data: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
         """
         Clean all DataFrames.
 

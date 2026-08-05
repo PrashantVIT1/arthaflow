@@ -117,9 +117,9 @@ class ETLService:
         if last_execution is not None:
             etl_state["last_execution"] = last_execution
         if last_successful_import_timestamp is not None:
-            etl_state[
-                "last_successful_import_timestamp"
-            ] = last_successful_import_timestamp
+            etl_state["last_successful_import_timestamp"] = (
+                last_successful_import_timestamp
+            )
 
     def get_state(self) -> ETLState:
         """Get current persistent ETL state."""
@@ -210,14 +210,10 @@ class ETLService:
         if request.import_mode == "clear":
             operation_name = "Clear Dataset"
         elif request.import_mode == "replace":
-            dataset_type = (
-                "Sample" if request.dataset_source == "sample" else "Custom"
-            )
+            dataset_type = "Sample" if request.dataset_source == "sample" else "Custom"
             operation_name = f"Replace {dataset_type} Dataset"
         elif request.import_mode == "append":
-            dataset_type = (
-                "Sample" if request.dataset_source == "sample" else "Custom"
-            )
+            dataset_type = "Sample" if request.dataset_source == "sample" else "Custom"
             operation_name = f"Append {dataset_type} Dataset"
 
         # Initialize response counters
@@ -275,9 +271,7 @@ class ETLService:
                         "products_imported": 0,
                         "orders_imported": 0,
                         "records_skipped": 0,
-                        "completed_at": (
-                            datetime.now().isoformat()
-                        ),
+                        "completed_at": (datetime.now().isoformat()),
                     },
                 )
 
@@ -365,9 +359,7 @@ class ETLService:
                                 + response.products_skipped
                                 + response.orders_skipped
                             ),
-                            "completed_at": (
-                                datetime.now().isoformat()
-                            ),
+                            "completed_at": (datetime.now().isoformat()),
                         },
                         last_successful_import_timestamp=datetime.now(),
                     )
@@ -381,9 +373,7 @@ class ETLService:
                         f"Sample dataset import failed: {str(e)}",
                         "error",
                     )
-                    response.message = (
-                        f"Sample dataset import failed: {str(e)}"
-                    )
+                    response.message = f"Sample dataset import failed: {str(e)}"
                     return response
 
             elif request.import_mode == "replace":
@@ -412,9 +402,7 @@ class ETLService:
                             "No files provided for custom dataset",
                             "load",
                         )
-                        response.message = (
-                            "No files provided for custom dataset"
-                        )
+                        response.message = "No files provided for custom dataset"
                         return response
                     self._update_status(
                         "running",
@@ -474,9 +462,7 @@ class ETLService:
                             "No files provided for custom dataset",
                             "load",
                         )
-                        response.message = (
-                            "No files provided for custom dataset"
-                        )
+                        response.message = "No files provided for custom dataset"
                         return response
                     self._update_status(
                         "running",
@@ -517,18 +503,14 @@ class ETLService:
             else:
                 self._update_status(
                     "error",
-                    error_message=(
-                        f"Invalid import mode: {request.import_mode}"
-                    ),
+                    error_message=(f"Invalid import mode: {request.import_mode}"),
                 )
                 self._add_log(
                     "error",
                     f"Invalid import mode: {request.import_mode}",
                     "initialization",
                 )
-                response.message = (
-                    f"Invalid import mode: {request.import_mode}"
-                )
+                response.message = f"Invalid import mode: {request.import_mode}"
                 return response
 
             # Calculate total
@@ -583,9 +565,7 @@ class ETLService:
                         + response.products_skipped
                         + response.orders_skipped
                     ),
-                    "completed_at": (
-                        datetime.now().isoformat()
-                    ),
+                    "completed_at": (datetime.now().isoformat()),
                 },
                 last_successful_import_timestamp=datetime.now(),
             )
@@ -722,9 +702,7 @@ class ETLService:
 
         # Get existing primary keys from database
         with engine.connect() as conn:
-            result = conn.execute(
-                text(f"SELECT {pk_column} FROM {table_name}")
-            )
+            result = conn.execute(text(f"SELECT {pk_column} FROM {table_name}"))
             existing_keys = set(row[0] for row in result)
 
         # Filter out rows with existing primary keys

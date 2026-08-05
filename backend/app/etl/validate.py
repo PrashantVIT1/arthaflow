@@ -15,9 +15,7 @@ class Validator:
         self.config = config or ETLConfig()
         self.validation_errors = []
 
-    def check_required_columns(
-        self, df: pd.DataFrame, table_name: str
-    ) -> bool:
+    def check_required_columns(self, df: pd.DataFrame, table_name: str) -> bool:
         """
         Check if DataFrame has all required columns.
 
@@ -68,9 +66,7 @@ class Validator:
 
         return True
 
-    def check_null_values(
-        self, df: pd.DataFrame, table_name: str
-    ) -> Dict[str, int]:
+    def check_null_values(self, df: pd.DataFrame, table_name: str) -> Dict[str, int]:
         """
         Check for null values in required columns.
 

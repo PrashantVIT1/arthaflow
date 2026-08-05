@@ -15,15 +15,11 @@ class Order(Base):
     customer_id = Column(
         Integer, ForeignKey("customers.id"), nullable=False, index=True
     )
-    product_id = Column(
-        Integer, ForeignKey("products.id"), nullable=False, index=True
-    )
+    product_id = Column(Integer, ForeignKey("products.id"), nullable=False, index=True)
     quantity = Column(Integer, nullable=False)
     unit_price = Column(Float, nullable=False)
     total_amount = Column(Float, nullable=False)
-    order_date = Column(
-        DateTime(timezone=True), server_default=func.now(), index=True
-    )
+    order_date = Column(DateTime(timezone=True), server_default=func.now(), index=True)
     status = Column(String(50), default="completed")
     region = Column(String(100), index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

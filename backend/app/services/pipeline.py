@@ -11,8 +11,7 @@ class PipelineService:
     def __init__(self):
         """Initialize pipeline service."""
         self.data_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "data"
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data"
         )
 
     def get_sample_dataset_metadata(self) -> SampleDatasetMetadata:
@@ -33,14 +32,10 @@ class PipelineService:
             else 0
         )
         products_count = (
-            self._count_csv_rows(products_file)
-            if os.path.exists(products_file)
-            else 0
+            self._count_csv_rows(products_file) if os.path.exists(products_file) else 0
         )
         orders_count = (
-            self._count_csv_rows(orders_file)
-            if os.path.exists(orders_file)
-            else 0
+            self._count_csv_rows(orders_file) if os.path.exists(orders_file) else 0
         )
 
         return SampleDatasetMetadata(

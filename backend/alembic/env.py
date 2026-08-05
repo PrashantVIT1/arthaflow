@@ -3,12 +3,13 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
-# Add the backend directory to Python path
-sys.path.append(str(Path(__file__).resolve().parents[1]))
-
-from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import MetaData, engine_from_config, pool
+
+from alembic import context
+
+# Add the backend directory to Python path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 # Load environment variables from .env file
 env_path = Path(__file__).resolve().parents[1] / ".env"
@@ -86,10 +87,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

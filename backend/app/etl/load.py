@@ -62,10 +62,7 @@ class Loader:
         try:
             with self.engine.connect() as conn:
                 conn.execute(
-                    text(
-                        f"TRUNCATE TABLE {table_name} "
-                        "RESTART IDENTITY CASCADE;"
-                    )
+                    text(f"TRUNCATE TABLE {table_name} " "RESTART IDENTITY CASCADE;")
                 )
                 conn.commit()
                 print(f"Truncated table {table_name}")
@@ -119,10 +116,7 @@ class Loader:
             self.truncate_table("customers")
 
         # Select only columns that exist in the database table
-        columns_to_load = [
-            "id", "name", "email", "phone",
-            "address", "city", "country"
-        ]
+        columns_to_load = ["id", "name", "email", "phone", "address", "city", "country"]
         df_to_load = df[[col for col in columns_to_load if col in df.columns]]
 
         return self.load_dataframe(df_to_load, "customers", if_exists="append")
@@ -204,9 +198,7 @@ class Loader:
         # Load orders last (depends on customers and products)
         if "orders" in data:
             try:
-                results["orders"] = self.load_orders(
-                    data["orders"], truncate=False
-                )
+                results["orders"] = self.load_orders(data["orders"], truncate=False)
             except Exception as e:
                 print(f"Error loading orders: {e}")
                 results["orders"] = 0
