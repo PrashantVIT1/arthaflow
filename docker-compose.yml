@@ -1,11 +1,7 @@
-version: "3.9"
-
 services:
-
   postgres:
     image: postgres:16
     container_name: arthaflow-db
-
     restart: always
 
     environment:
@@ -20,7 +16,8 @@ services:
       - postgres_data:/var/lib/postgresql/data
 
   backend:
-    build: ./backend
+    build:
+      context: ./backend
 
     container_name: arthaflow-api
 
@@ -37,7 +34,8 @@ services:
       - ./backend:/app
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
 
     container_name: arthaflow-ui
 
@@ -50,12 +48,12 @@ services:
     environment:
       VITE_API_URL: http://localhost:8000
 
+    env_file:
+      - ./frontend/.env
+
     volumes:
       - ./frontend:/app
       - /app/node_modules
-    
-    env_file:
-      - ./frontend/.env
 
 volumes:
   postgres_data:
