@@ -2,9 +2,10 @@
 
 from typing import List
 
-from app.schemas.customer import CustomerResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
+
+from app.schemas.customer import CustomerResponse
 
 
 class CustomerService:
@@ -34,15 +35,23 @@ class CustomerService:
                 c.country,
                 c.created_at,
                 c.updated_at,
-                COALESCE(COUNT(o.id), 0) as total_orders,
-                COALESCE(SUM(o.total_amount), 0) as total_spent,
-                MAX(o.order_date) as last_order_date
+                COALESCE(COUNT(o.id), 0) AS total_orders,
+                COALESCE(SUM(o.total_amount), 0) AS total_spent,
+                MAX(o.order_date) AS last_order_date
             FROM customers c
             LEFT JOIN orders o ON c.id = o.customer_id
-            GROUP BY c.id, c.name, c.email, c.phone, c.address, c.city,
-                c.country, c.created_at, c.updated_at
+            GROUP BY
+                c.id,
+                c.name,
+                c.email,
+                c.phone,
+                c.address,
+                c.city,
+                c.country,
+                c.created_at,
+                c.updated_at
             ORDER BY c.id
-        """
+            """
         )
 
         result = self.db.execute(query)

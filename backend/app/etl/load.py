@@ -3,9 +3,10 @@
 from typing import Dict
 
 import pandas as pd
+from sqlalchemy import text
+
 from app.database.config import get_engine
 from app.etl.config import ETLConfig
-from sqlalchemy import text
 
 
 class Loader:
@@ -62,7 +63,7 @@ class Loader:
             with self.engine.connect() as conn:
                 conn.execute(
                     text(
-                        "TRUNCATE TABLE {table_name} "
+                        f"TRUNCATE TABLE {table_name} "
                         "RESTART IDENTITY CASCADE;"
                     )
                 )

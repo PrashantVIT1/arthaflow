@@ -1,8 +1,11 @@
+import os
 import sys
 from logging.config import fileConfig
 from pathlib import Path
 
+from alembic import context
 from dotenv import load_dotenv
+from sqlalchemy import MetaData, engine_from_config, pool
 
 # Load environment variables from .env file
 env_path = Path(__file__).resolve().parents[1] / ".env"
@@ -10,9 +13,6 @@ load_dotenv(env_path)
 
 # Add the backend directory to Python path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
-
-from alembic import context  # noqa: E402
-from sqlalchemy import MetaData, engine_from_config, pool  # noqa: E402
 
 # Don't import models to avoid connection issues
 # Use empty metadata for manual migrations
@@ -39,7 +39,6 @@ if config.config_file_name is not None:
 
 def get_database_url():
     """Get database URL from environment or config."""
-    import os
 
     return os.getenv("DATABASE_URL", config.get_main_option("sqlalchemy.url"))
 

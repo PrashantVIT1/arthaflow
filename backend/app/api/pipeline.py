@@ -1,8 +1,9 @@
 """API routes for data pipeline endpoints."""
 
+from fastapi import APIRouter, HTTPException
+
 from app.schemas.pipeline import SampleDatasetMetadata
 from app.services.pipeline import PipelineService
-from fastapi import APIRouter, HTTPException
 
 router = APIRouter(prefix="/pipeline", tags=["pipeline"])
 
@@ -19,5 +20,5 @@ def get_sample_dataset_metadata():
     try:
         service = PipelineService()
         return service.get_sample_dataset_metadata()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=str(exc)) from exc

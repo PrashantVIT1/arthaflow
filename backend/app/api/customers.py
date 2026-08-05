@@ -4,12 +4,13 @@ import csv
 import io
 from typing import List
 
-from app.database.config import get_db
-from app.schemas.customer import CustomerResponse
-from app.services.customer import CustomerService
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+
+from app.database.config import get_db
+from app.schemas.customer import CustomerResponse
+from app.services.customer import CustomerService
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 

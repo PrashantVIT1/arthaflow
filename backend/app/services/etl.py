@@ -1,15 +1,23 @@
 """Service layer for ETL operations."""
 
 import os
+import time
 from datetime import datetime
 from typing import List
 
 import pandas as pd
-from app.database.config import get_engine
-from app.schemas.etl import (ArchiveModeVerifyResponse, ETLLogEntry,
-                             ETLLogsResponse, ETLRunRequest, ETLRunResponse,
-                             ETLState, ETLStatus)
 from sqlalchemy import text
+
+from app.database.config import get_engine
+from app.schemas.etl import (
+    ArchiveModeVerifyResponse,
+    ETLLogEntry,
+    ETLLogsResponse,
+    ETLRunRequest,
+    ETLRunResponse,
+    ETLState,
+    ETLStatus,
+)
 
 # Global state for ETL status and logs (in-memory for simplicity)
 etl_status = {
@@ -194,7 +202,6 @@ class ETLService:
         self._update_status("idle")
 
         # Track execution time
-        import time
 
         start_time = time.time()
 
