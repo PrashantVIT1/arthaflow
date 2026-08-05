@@ -3,6 +3,9 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
+# Add the backend directory to Python path
+sys.path.append(str(Path(__file__).resolve().parents[1]))
+
 from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import MetaData, engine_from_config, pool
@@ -11,8 +14,6 @@ from sqlalchemy import MetaData, engine_from_config, pool
 env_path = Path(__file__).resolve().parents[1] / ".env"
 load_dotenv(env_path)
 
-# Add the backend directory to Python path
-sys.path.append(str(Path(__file__).resolve().parents[1]))
 
 # Don't import models to avoid connection issues
 # Use empty metadata for manual migrations
