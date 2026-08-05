@@ -4,18 +4,12 @@ import os
 import uuid
 from typing import List
 
-from fastapi import APIRouter, File, HTTPException, UploadFile
-
-from app.schemas.etl import (
-    ArchiveModeVerifyRequest,
-    ArchiveModeVerifyResponse,
-    ETLLogsResponse,
-    ETLRunRequest,
-    ETLRunResponse,
-    ETLState,
-    ETLStatus,
-)
+from app.schemas.etl import (ArchiveModeVerifyRequest,
+                             ArchiveModeVerifyResponse, ETLLogsResponse,
+                             ETLRunRequest, ETLRunResponse, ETLState,
+                             ETLStatus)
 from app.services.etl import ETLService
+from fastapi import APIRouter, File, HTTPException, UploadFile
 
 router = APIRouter(prefix="/etl", tags=["etl"])
 

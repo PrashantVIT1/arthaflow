@@ -11,9 +11,8 @@ load_dotenv(env_path)
 # Add the backend directory to Python path
 sys.path.append(str(Path(__file__).resolve().parents[1]))
 
-from sqlalchemy import MetaData, engine_from_config, pool  # noqa: E402
-
 from alembic import context  # noqa: E402
+from sqlalchemy import MetaData, engine_from_config, pool  # noqa: E402
 
 # Don't import models to avoid connection issues
 # Use empty metadata for manual migrations

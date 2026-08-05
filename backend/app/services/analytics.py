@@ -2,17 +2,11 @@
 
 from typing import List
 
-from sqlalchemy.orm import Session
-
 from app.repositories.analytics import AnalyticsRepository
-from app.schemas.analytics import (
-    CategorySales,
-    DashboardKPI,
-    DashboardResponse,
-    MonthlySales,
-    RegionalSales,
-    TopProduct,
-)
+from app.schemas.analytics import (CategorySales, DashboardKPI,
+                                   DashboardResponse, MonthlySales,
+                                   RegionalSales, TopProduct)
+from sqlalchemy.orm import Session
 
 
 class AnalyticsService:

@@ -19,10 +19,9 @@ if not os.getenv("DATABASE_URL"):
 import random  # noqa: E402
 from datetime import datetime, timedelta  # noqa: E402
 
-from sqlalchemy.orm import Session  # noqa: E402
-
 from app.database.config import SessionLocal  # noqa: E402
 from app.models import Customer, Order, Product  # noqa: E402
+from sqlalchemy.orm import Session  # noqa: E402
 
 
 def seed_customers(db: Session):
