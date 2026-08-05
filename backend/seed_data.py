@@ -3,17 +3,17 @@ Seed data script for retail analytics platform.
 Run this script to populate the database with sample data.
 """
 
-import random  # noqa: E402
-from datetime import datetime, timedelta  # noqa: E402
+import random
+from datetime import datetime, timedelta
 
-from app.database.config import SessionLocal  # noqa: E402
-from app.models import Customer, Order, Product  # noqa: E402
 from dotenv import load_dotenv
-from sqlalchemy.orm import Session  # noqa: E402
+from sqlalchemy.orm import Session
+
+from app.database.config import SessionLocal
+from app.models import Customer, Order, Product
 
 # Load environment variables
 load_dotenv()
-
 
 def seed_customers(db: Session):
     """Seed customers table with sample data."""
