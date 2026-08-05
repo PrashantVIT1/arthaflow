@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Index, Integer, String
+from sqlalchemy import Column, DateTime, Integer, String
 from sqlalchemy.sql import func
 
 from app.database.config import Base
@@ -16,8 +16,13 @@ class Customer(Base):
     address = Column(String(500))
     city = Column(String(100))
     country = Column(String(100))
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    created_at = Column(
+        DateTime(timezone=True), server_default=func.now()
+    )
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
-        return f"<Customer(id={self.id}, name={self.name}, email={self.email})>"
+        return (
+            f"<Customer(id={self.id}, name={self.name}, "
+            f"email={self.email})>"
+        )

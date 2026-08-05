@@ -1,6 +1,6 @@
 """ETL Pipeline orchestrator."""
 
-from typing import Dict, Optional
+from typing import Dict
 
 from app.etl.clean import Cleaner
 from app.etl.config import ETLConfig
@@ -71,7 +71,9 @@ class ETLPipeline:
             validation_results = self.validator.validate_all(extracted_data)
             results["validate"]["results"] = validation_results
 
-            all_valid = all(result[0] for result in validation_results.values())
+            all_valid = all(
+                result[0] for result in validation_results.values()
+            )
             results["validate"]["all_valid"] = all_valid
 
             if not all_valid:
@@ -117,7 +119,9 @@ class ETLPipeline:
         print("\n--- LOAD ---")
         if not skip_load:
             try:
-                load_results = self.loader.load_all(transformed_data, truncate=truncate)
+                load_results = self.loader.load_all(
+                    transformed_data, truncate=truncate
+                )
                 results["load"]["success"] = True
                 results["load"]["rows"] = load_results
             except Exception as e:

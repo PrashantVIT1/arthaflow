@@ -42,16 +42,26 @@ class AnalyticsService:
             DashboardResponse with KPIs and trends
         """
         kpis_data = self.repository.get_dashboard_kpis(
-            start_date=start_date, end_date=end_date, category=category, region=region
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            region=region,
         )
         monthly_sales_data = self.repository.get_monthly_sales(
-            start_date=start_date, end_date=end_date, category=category, region=region
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            region=region,
         )
         category_sales_data = self.repository.get_category_sales(
-            start_date=start_date, end_date=end_date, region=region
+            start_date=start_date,
+            end_date=end_date,
+            region=region,
         )
         regional_sales_data = self.repository.get_regional_sales(
-            start_date=start_date, end_date=end_date, category=category
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
         )
         top_products_data = self.repository.get_top_products(
             limit=10,
@@ -63,10 +73,18 @@ class AnalyticsService:
 
         return DashboardResponse(
             kpis=DashboardKPI(**kpis_data),
-            monthly_sales=[MonthlySales(**data) for data in monthly_sales_data],
-            category_sales=[CategorySales(**data) for data in category_sales_data],
-            regional_sales=[RegionalSales(**data) for data in regional_sales_data],
-            top_products=[TopProduct(**data) for data in top_products_data],
+            monthly_sales=[
+                MonthlySales(**data) for data in monthly_sales_data
+            ],
+            category_sales=[
+                CategorySales(**data) for data in category_sales_data
+            ],
+            regional_sales=[
+                RegionalSales(**data) for data in regional_sales_data
+            ],
+            top_products=[
+                TopProduct(**data) for data in top_products_data
+            ],
         )
 
     def get_monthly_sales(
@@ -89,7 +107,10 @@ class AnalyticsService:
             List of monthly sales records
         """
         data = self.repository.get_monthly_sales(
-            start_date=start_date, end_date=end_date, category=category, region=region
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            region=region,
         )
         return [MonthlySales(**item) for item in data]
 
@@ -113,7 +134,10 @@ class AnalyticsService:
         return [CategorySales(**item) for item in data]
 
     def get_regional_sales(
-        self, start_date: str = None, end_date: str = None, category: str = None
+        self,
+        start_date: str = None,
+        end_date: str = None,
+        category: str = None
     ) -> List[RegionalSales]:
         """
         Get sales by region.

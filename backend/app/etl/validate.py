@@ -15,7 +15,9 @@ class Validator:
         self.config = config or ETLConfig()
         self.validation_errors = []
 
-    def check_required_columns(self, df: pd.DataFrame, table_name: str) -> bool:
+    def check_required_columns(
+        self, df: pd.DataFrame, table_name: str
+    ) -> bool:
         """
         Check if DataFrame has all required columns.
 
@@ -56,7 +58,8 @@ class Validator:
                 actual_type = str(df[col].dtype)
                 if expected_type not in actual_type:
                     type_errors.append(
-                        f"{table_name}.{col}: Expected {expected_type}, got {actual_type}"
+                        f"{table_name}.{col}: Expected {expected_type}, "
+                        f"got {actual_type}"
                     )
 
         if type_errors:
@@ -65,7 +68,9 @@ class Validator:
 
         return True
 
-    def check_null_values(self, df: pd.DataFrame, table_name: str) -> Dict[str, int]:
+    def check_null_values(
+        self, df: pd.DataFrame, table_name: str
+    ) -> Dict[str, int]:
         """
         Check for null values in required columns.
 
@@ -111,7 +116,8 @@ class Validator:
 
         if duplicate_count > 0:
             self.validation_errors.append(
-                f"{table_name}: {duplicate_count} duplicate {id_column} values found"
+                f"{table_name}: {duplicate_count} duplicate "
+                f"{id_column} values found"
             )
 
         return duplicate_count

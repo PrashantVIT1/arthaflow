@@ -1,6 +1,6 @@
 """Transform module for data transformations."""
 
-from typing import Dict, Optional
+from typing import Dict
 
 import pandas as pd
 
@@ -61,9 +61,10 @@ class Transformer:
 
         # Calculate profit: (price - cost) * quantity
         if "cost" in merged.columns:
-            merged["profit"] = (merged["unit_price"] - merged["cost"]) * merged[
-                "quantity"
-            ]
+            merged["profit"] = (
+                (merged["unit_price"] - merged["cost"])
+                * merged["quantity"]
+            )
             print("Calculated profit for orders")
 
         # Remove the duplicate id column from products
@@ -137,11 +138,15 @@ class Transformer:
 
         # Add order year and month for time-based analytics
         if "order_date" in df_transformed.columns:
-            df_transformed["order_year"] = df_transformed["order_date"].dt.year
-            df_transformed["order_month"] = df_transformed["order_date"].dt.month
-            df_transformed["order_month_name"] = df_transformed[
-                "order_date"
-            ].dt.strftime("%B")
+            df_transformed["order_year"] = (
+                df_transformed["order_date"].dt.year
+            )
+            df_transformed["order_month"] = (
+                df_transformed["order_date"].dt.month
+            )
+            df_transformed["order_month_name"] = (
+                df_transformed["order_date"].dt.strftime("%B")
+            )
             print("Added order_year, order_month, order_month_name")
 
         # Add profit margin percentage
@@ -150,7 +155,11 @@ class Transformer:
             and "total_amount" in df_transformed.columns
         ):
             df_transformed["profit_margin"] = (
-                (df_transformed["profit"] / df_transformed["total_amount"]) * 100
+                (
+                    df_transformed["profit"]
+                    / df_transformed["total_amount"]
+                )
+                * 100
             ).round(2)
             print("Added profit_margin")
 
@@ -175,11 +184,15 @@ class Transformer:
         orders_transformed = self.calculate_revenue(orders_df)
 
         # Calculate profit
-        orders_transformed = self.calculate_profit(orders_transformed, products_df)
+        orders_transformed = self.calculate_profit(
+            orders_transformed, products_df
+        )
 
         return orders_transformed
 
-    def transform_all(self, data: Dict[str, pd.DataFrame]) -> Dict[str, pd.DataFrame]:
+    def transform_all(
+        self, data: Dict[str, pd.DataFrame]
+    ) -> Dict[str, pd.DataFrame]:
         """
         Transform all data sources.
 

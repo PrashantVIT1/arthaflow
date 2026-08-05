@@ -1,6 +1,6 @@
 """Service for customer operations."""
 
-from typing import List, Optional
+from typing import List
 
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -25,7 +25,7 @@ class CustomerService:
         # Query customers with order aggregations
         query = text(
             """
-            SELECT 
+            SELECT
                 c.id,
                 c.name,
                 c.email,
@@ -40,7 +40,8 @@ class CustomerService:
                 MAX(o.order_date) as last_order_date
             FROM customers c
             LEFT JOIN orders o ON c.id = o.customer_id
-            GROUP BY c.id, c.name, c.email, c.phone, c.address, c.city, c.country, c.created_at, c.updated_at
+            GROUP BY c.id, c.name, c.email, c.phone, c.address, c.city,
+                c.country, c.created_at, c.updated_at
             ORDER BY c.id
         """
         )
@@ -59,7 +60,9 @@ class CustomerService:
                     city=row.city,
                     country=row.country,
                     total_orders=row.total_orders,
-                    total_spent=float(row.total_spent) if row.total_spent else 0.0,
+                    total_spent=float(row.total_spent)
+                    if row.total_spent
+                    else 0.0,
                     last_order_date=row.last_order_date,
                     created_at=row.created_at,
                     updated_at=row.updated_at,

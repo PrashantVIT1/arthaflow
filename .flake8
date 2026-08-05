@@ -1,0 +1,15 @@
+[flake8]
+exclude =
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    env,
+    node_modules,
+    frontend/node_modules,
+    build,
+    dist,
+    migrations,
+    .pytest_cache,
+    .mypy_cache
+max-line-length = 79

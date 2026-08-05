@@ -2,11 +2,10 @@
 
 from typing import Any, Dict, List
 
-import pandas as pd
 from sqlalchemy import extract, func
 from sqlalchemy.orm import Session
 
-from app.models import Customer, Order, Product
+from app.models import Order, Product
 
 
 class AnalyticsRepository:
@@ -54,27 +53,34 @@ class AnalyticsRepository:
             query = query.filter(Order.region == region)
 
         # Total revenue
-        total_revenue = query.with_entities(func.sum(Order.total_amount)).scalar() or 0
+        total_revenue = (
+            query.with_entities(func.sum(Order.total_amount)).scalar() or 0
+        )
 
         # Total orders
         total_orders = query.with_entities(func.count(Order.id)).scalar() or 0
 
         # Total customers (unique customers from filtered orders)
         total_customers = (
-            query.with_entities(func.count(func.distinct(Order.customer_id))).scalar()
+            query.with_entities(
+                func.count(func.distinct(Order.customer_id))
+            ).scalar()
             or 0
         )
 
         # Total products (unique products from filtered orders)
         total_products = (
-            query.with_entities(func.count(func.distinct(Order.product_id))).scalar()
+            query.with_entities(
+                func.count(func.distinct(Order.product_id))
+            ).scalar()
             or 0
         )
 
         # Calculate profit (need to join with products)
         profit_query = self.db.query(
             func.sum(
-                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+                (Order.unit_price - func.coalesce(Product.cost, 0))
+                * Order.quantity
             )
         ).join(Product, Order.product_id == Product.id)
 
@@ -90,7 +96,11 @@ class AnalyticsRepository:
         total_profit = profit_query.scalar() or 0
 
         # Profit margin
-        profit_margin = (total_profit / total_revenue * 100) if total_revenue > 0 else 0
+        profit_margin = (
+            (total_profit / total_revenue * 100)
+            if total_revenue > 0
+            else 0
+        )
 
         return {
             "total_revenue": float(total_revenue),
@@ -126,7 +136,8 @@ class AnalyticsRepository:
             func.sum(Order.total_amount).label("revenue"),
             func.count(Order.id).label("orders"),
             func.sum(
-                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+                (Order.unit_price - func.coalesce(Product.cost, 0))
+                * Order.quantity
             ).label("profit"),
         ).join(Product, Order.product_id == Product.id)
 
@@ -141,9 +152,11 @@ class AnalyticsRepository:
             query = query.filter(Order.region == region)
 
         query = query.group_by(
-            extract("year", Order.order_date), extract("month", Order.order_date)
+            extract("year", Order.order_date),
+            extract("month", Order.order_date)
         ).order_by(
-            extract("year", Order.order_date), extract("month", Order.order_date)
+            extract("year", Order.order_date),
+            extract("month", Order.order_date)
         )
 
         results = query.all()
@@ -167,7 +180,9 @@ class AnalyticsRepository:
             {
                 "year": int(r.year),
                 "month": int(r.month),
-                "month_name": month_names.get(int(r.month), ""),
+                "month_name": month_names.get(
+                    int(r.month), ""
+                ),
                 "revenue": float(r.revenue or 0),
                 "orders": r.orders,
                 "profit": float(r.profit or 0),
@@ -176,7 +191,9 @@ class AnalyticsRepository:
         ]
 
     def get_category_sales(
-        self, start_date: str = None, end_date: str = None, region: str = None
+        self, start_date: str = None,
+        end_date: str = None,
+        region: str = None
     ) -> List[Dict[str, Any]]:
         """
         Get sales by category.
@@ -194,7 +211,8 @@ class AnalyticsRepository:
             func.sum(Order.total_amount).label("revenue"),
             func.count(Order.id).label("orders"),
             func.sum(
-                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+                (Order.unit_price - func.coalesce(Product.cost, 0))
+                * Order.quantity
             ).label("profit"),
         ).join(Product, Order.product_id == Product.id)
 
@@ -223,7 +241,10 @@ class AnalyticsRepository:
         ]
 
     def get_regional_sales(
-        self, start_date: str = None, end_date: str = None, category: str = None
+        self,
+        start_date: str = None,
+        end_date: str = None,
+        category: str = None
     ) -> List[Dict[str, Any]]:
         """
         Get sales by region.
@@ -241,7 +262,8 @@ class AnalyticsRepository:
             func.sum(Order.total_amount).label("revenue"),
             func.count(Order.id).label("orders"),
             func.sum(
-                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+                (Order.unit_price - func.coalesce(Product.cost, 0))
+                * Order.quantity
             ).label("profit"),
         ).join(Product, Order.product_id == Product.id)
 
@@ -297,7 +319,8 @@ class AnalyticsRepository:
             func.sum(Order.quantity).label("quantity_sold"),
             func.sum(Order.total_amount).label("revenue"),
             func.sum(
-                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+                (Order.unit_price - func.coalesce(Product.cost, 0))
+                * Order.quantity
             ).label("profit"),
         ).join(Order, Order.product_id == Product.id)
 

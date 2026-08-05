@@ -24,9 +24,13 @@ router = APIRouter(prefix="/analytics", tags=["analytics"])
 @router.get("/dashboard", response_model=DashboardResponse)
 def get_dashboard(
     start_date: Optional[str] = Query(
-        None, description="Start date filter (YYYY-MM-DD)"
+        None,
+        description="Start date filter (YYYY-MM-DD)",
     ),
-    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(
+        None,
+        description="End date filter (YYYY-MM-DD)",
+    ),
     category: Optional[str] = Query(None, description="Category filter"),
     region: Optional[str] = Query(None, description="Region filter"),
     db: Session = Depends(get_db),
@@ -41,12 +45,16 @@ def get_dashboard(
         region: Optional region filter
 
     Returns:
-        DashboardResponse with KPIs, monthly sales, category sales, regional sales, and top products
+        DashboardResponse with KPIs, monthly sales, category sales,
+        regional sales, and top products
     """
     try:
         service = AnalyticsService(db)
         return service.get_dashboard(
-            start_date=start_date, end_date=end_date, category=category, region=region
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            region=region,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -55,9 +63,13 @@ def get_dashboard(
 @router.get("/sales/monthly", response_model=List[MonthlySales])
 def get_monthly_sales(
     start_date: Optional[str] = Query(
-        None, description="Start date filter (YYYY-MM-DD)"
+        None,
+        description="Start date filter (YYYY-MM-DD)",
     ),
-    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(
+        None,
+        description="End date filter (YYYY-MM-DD)",
+    ),
     category: Optional[str] = Query(None, description="Category filter"),
     region: Optional[str] = Query(None, description="Region filter"),
     db: Session = Depends(get_db),
@@ -72,12 +84,16 @@ def get_monthly_sales(
         region: Optional region filter
 
     Returns:
-        List of monthly sales records with year, month, revenue, orders, and profit
+        List of monthly sales records with year, month, revenue,
+        orders, and profit
     """
     try:
         service = AnalyticsService(db)
         return service.get_monthly_sales(
-            start_date=start_date, end_date=end_date, category=category, region=region
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            region=region,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -86,9 +102,13 @@ def get_monthly_sales(
 @router.get("/sales/category", response_model=List[CategorySales])
 def get_category_sales(
     start_date: Optional[str] = Query(
-        None, description="Start date filter (YYYY-MM-DD)"
+        None,
+        description="Start date filter (YYYY-MM-DD)",
     ),
-    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(
+        None,
+        description="End date filter (YYYY-MM-DD)",
+    ),
     region: Optional[str] = Query(None, description="Region filter"),
     db: Session = Depends(get_db),
 ):
@@ -101,12 +121,15 @@ def get_category_sales(
         region: Optional region filter
 
     Returns:
-        List of category sales records with category, revenue, orders, and profit
+        List of category sales records with category, revenue,
+        orders, and profit
     """
     try:
         service = AnalyticsService(db)
         return service.get_category_sales(
-            start_date=start_date, end_date=end_date, region=region
+            start_date=start_date,
+            end_date=end_date,
+            region=region,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -115,9 +138,13 @@ def get_category_sales(
 @router.get("/sales/region", response_model=List[RegionalSales])
 def get_regional_sales(
     start_date: Optional[str] = Query(
-        None, description="Start date filter (YYYY-MM-DD)"
+        None,
+        description="Start date filter (YYYY-MM-DD)",
     ),
-    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(
+        None,
+        description="End date filter (YYYY-MM-DD)",
+    ),
     category: Optional[str] = Query(None, description="Category filter"),
     db: Session = Depends(get_db),
 ):
@@ -135,7 +162,9 @@ def get_regional_sales(
     try:
         service = AnalyticsService(db)
         return service.get_regional_sales(
-            start_date=start_date, end_date=end_date, category=category
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -145,9 +174,13 @@ def get_regional_sales(
 def get_top_products(
     limit: int = 10,
     start_date: Optional[str] = Query(
-        None, description="Start date filter (YYYY-MM-DD)"
+        None,
+        description="Start date filter (YYYY-MM-DD)",
     ),
-    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(
+        None,
+        description="End date filter (YYYY-MM-DD)",
+    ),
     category: Optional[str] = Query(None, description="Category filter"),
     region: Optional[str] = Query(None, description="Region filter"),
     db: Session = Depends(get_db),
@@ -163,7 +196,8 @@ def get_top_products(
         region: Optional region filter
 
     Returns:
-        List of top product records with product details, quantity sold, revenue, and profit
+        List of top product records with product details,
+        quantity sold, revenue, and profit
     """
     try:
         service = AnalyticsService(db)
@@ -181,9 +215,13 @@ def get_top_products(
 @router.get("/export/dashboard")
 def export_dashboard_csv(
     start_date: Optional[str] = Query(
-        None, description="Start date filter (YYYY-MM-DD)"
+        None,
+        description="Start date filter (YYYY-MM-DD)",
     ),
-    end_date: Optional[str] = Query(None, description="End date filter (YYYY-MM-DD)"),
+    end_date: Optional[str] = Query(
+        None,
+        description="End date filter (YYYY-MM-DD)",
+    ),
     category: Optional[str] = Query(None, description="Category filter"),
     region: Optional[str] = Query(None, description="Region filter"),
     db: Session = Depends(get_db),
@@ -203,7 +241,10 @@ def export_dashboard_csv(
     try:
         service = AnalyticsService(db)
         dashboard_data = service.get_dashboard(
-            start_date=start_date, end_date=end_date, category=category, region=region
+            start_date=start_date,
+            end_date=end_date,
+            category=category,
+            region=region,
         )
 
         output = io.StringIO()
@@ -213,9 +254,13 @@ def export_dashboard_csv(
         writer.writerow(["Dashboard Summary"])
         writer.writerow([])
         writer.writerow(["Metric", "Value"])
-        writer.writerow(["Total Revenue", dashboard_data.kpis.total_revenue])
+        writer.writerow(
+            ["Total Revenue", dashboard_data.kpis.total_revenue]
+        )
         writer.writerow(["Total Orders", dashboard_data.kpis.total_orders])
-        writer.writerow(["Total Customers", dashboard_data.kpis.total_customers])
+        writer.writerow(
+            ["Total Customers", dashboard_data.kpis.total_customers]
+        )
         writer.writerow(["Total Profit", dashboard_data.kpis.total_profit])
         writer.writerow([])
 
@@ -225,7 +270,13 @@ def export_dashboard_csv(
         writer.writerow(["Month", "Year", "Revenue", "Orders", "Profit"])
         for item in dashboard_data.monthly_sales:
             writer.writerow(
-                [item.month_name, item.year, item.revenue, item.orders, item.profit]
+                [
+                    item.month_name,
+                    item.year,
+                    item.revenue,
+                    item.orders,
+                    item.profit,
+                ]
             )
         writer.writerow([])
 
@@ -234,7 +285,9 @@ def export_dashboard_csv(
         writer.writerow([])
         writer.writerow(["Category", "Revenue", "Orders", "Profit"])
         for item in dashboard_data.category_sales:
-            writer.writerow([item.category, item.revenue, item.orders, item.profit])
+            writer.writerow(
+                [item.category, item.revenue, item.orders, item.profit]
+            )
         writer.writerow([])
 
         # Write Regional Sales
@@ -242,7 +295,9 @@ def export_dashboard_csv(
         writer.writerow([])
         writer.writerow(["Region", "Revenue", "Orders", "Profit"])
         for item in dashboard_data.regional_sales:
-            writer.writerow([item.region, item.revenue, item.orders, item.profit])
+            writer.writerow(
+                [item.region, item.revenue, item.orders, item.profit]
+            )
         writer.writerow([])
 
         # Write Top Products
@@ -276,7 +331,9 @@ def export_dashboard_csv(
             io.BytesIO(output.getvalue().encode("utf-8")),
             media_type="text/csv",
             headers={
-                "Content-Disposition": 'attachment; filename="dashboard_summary.csv"'
+                "Content-Disposition": (
+                    'attachment; filename="dashboard_summary.csv"'
+                )
             },
         )
     except Exception as e:

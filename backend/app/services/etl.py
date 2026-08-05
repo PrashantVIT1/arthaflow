@@ -2,7 +2,7 @@
 
 import os
 from datetime import datetime
-from typing import Any, Dict, List
+from typing import List
 
 import pandas as pd
 from sqlalchemy import text
@@ -51,10 +51,12 @@ class ETLService:
     def __init__(self):
         """Initialize ETL service."""
         self.data_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "data"
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "data",
         )
         self.upload_dir = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "uploads"
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "uploads",
         )
 
     def _add_log(self, level: str, message: str, stage: str = None) -> None:
@@ -114,9 +116,9 @@ class ETLService:
         if last_execution is not None:
             etl_state["last_execution"] = last_execution
         if last_successful_import_timestamp is not None:
-            etl_state["last_successful_import_timestamp"] = (
-                last_successful_import_timestamp
-            )
+            etl_state[
+                "last_successful_import_timestamp"
+            ] = last_successful_import_timestamp
 
     def get_state(self) -> ETLState:
         """Get current persistent ETL state."""
@@ -186,7 +188,8 @@ class ETLService:
         Run ETL pipeline based on dataset source and import mode.
 
         Args:
-            request: ETL run request with dataset source, import mode, and files
+            request: ETL run request with dataset source, import mode,
+                and files
 
         Returns:
             ETLRunResponse with execution results
@@ -207,9 +210,15 @@ class ETLService:
         if request.import_mode == "clear":
             operation_name = "Clear Dataset"
         elif request.import_mode == "replace":
-            operation_name = f"Replace {'Sample' if request.dataset_source == 'sample' else 'Custom'} Dataset"
+            dataset_type = (
+                "Sample" if request.dataset_source == "sample" else "Custom"
+            )
+            operation_name = f"Replace {dataset_type} Dataset"
         elif request.import_mode == "append":
-            operation_name = f"Append {'Sample' if request.dataset_source == 'sample' else 'Custom'} Dataset"
+            dataset_type = (
+                "Sample" if request.dataset_source == "sample" else "Custom"
+            )
+            operation_name = f"Append {dataset_type} Dataset"
 
         # Initialize response counters
         response = ETLRunResponse(
@@ -247,7 +256,11 @@ class ETLService:
                 response.execution_time = round(execution_time, 2)
 
                 self._update_status("completed", "Completed", 1.0)
-                self._add_log("info", "Tables cleared successfully", "completion")
+                self._add_log(
+                    "info",
+                    "Tables cleared successfully",
+                    "completion",
+                )
                 response.success = True
                 response.message = "All tables cleared successfully"
 
@@ -262,7 +275,9 @@ class ETLService:
                         "products_imported": 0,
                         "orders_imported": 0,
                         "records_skipped": 0,
-                        "completed_at": datetime.now().isoformat(),
+                        "completed_at": (
+                            datetime.now().isoformat()
+                        ),
                     },
                 )
 
@@ -272,7 +287,11 @@ class ETLService:
             if request.dataset_source == "sample":
                 try:
                     # Step 1: Clear existing data
-                    self._update_status("running", "Clearing existing data...", 0.1)
+                    self._update_status(
+                        "running",
+                        "Clearing existing data...",
+                        0.1,
+                    )
                     self._add_log(
                         "info",
                         "Clearing existing business data before sample import",
@@ -284,14 +303,24 @@ class ETLService:
                     self._add_log("info", "Committing cleared data", "clear")
 
                     # Step 3: Import sample dataset
-                    self._update_status("running", "Importing sample dataset...", 0.5)
+                    self._update_status(
+                        "running",
+                        "Importing sample dataset...",
+                        0.5,
+                    )
                     self._add_log("info", "Loading sample dataset", "load")
                     self._load_sample_data(
-                        engine, response, "replace"
+                        engine,
+                        response,
+                        "replace",
                     )  # Use replace mode for sample
 
                     # Step 4: Commit after import
-                    self._add_log("info", "Committing sample dataset import", "load")
+                    self._add_log(
+                        "info",
+                        "Committing sample dataset import",
+                        "load",
+                    )
 
                     # Calculate total and execution time
                     response.total_records_processed = (
@@ -305,7 +334,11 @@ class ETLService:
                     self._update_status("completed", "Completed", 1.0)
                     self._add_log(
                         "info",
-                        f"Sample dataset loaded successfully. {response.total_records_processed} records processed.",
+                        (
+                            "Sample dataset loaded successfully. "
+                            f"{response.total_records_processed} "
+                            "records processed."
+                        ),
                         "completion",
                     )
 
@@ -327,10 +360,14 @@ class ETLService:
                             "customers_imported": response.customers_inserted,
                             "products_imported": response.products_inserted,
                             "orders_imported": response.orders_inserted,
-                            "records_skipped": response.customers_skipped
-                            + response.products_skipped
-                            + response.orders_skipped,
-                            "completed_at": datetime.now().isoformat(),
+                            "records_skipped": (
+                                response.customers_skipped
+                                + response.products_skipped
+                                + response.orders_skipped
+                            ),
+                            "completed_at": (
+                                datetime.now().isoformat()
+                            ),
                         },
                         last_successful_import_timestamp=datetime.now(),
                     )
@@ -340,73 +377,132 @@ class ETLService:
                     # Rollback on failure
                     self._update_status("error", error_message=str(e))
                     self._add_log(
-                        "error", f"Sample dataset import failed: {str(e)}", "error"
+                        "error",
+                        f"Sample dataset import failed: {str(e)}",
+                        "error",
                     )
-                    response.message = f"Sample dataset import failed: {str(e)}"
+                    response.message = (
+                        f"Sample dataset import failed: {str(e)}"
+                    )
                     return response
 
             elif request.import_mode == "replace":
                 # Clear tables in transaction, then import custom data
-                self._update_status("running", "Clearing tables for replace", 0.1)
-                self._add_log("info", "Clearing tables for replace mode", "clear")
+                self._update_status(
+                    "running",
+                    "Clearing tables for replace",
+                    0.1,
+                )
+                self._add_log(
+                    "info",
+                    "Clearing tables for replace mode",
+                    "clear",
+                )
                 self._clear_tables(engine)
 
                 # Import custom data only
                 if request.dataset_source == "custom":
                     if not request.files:
-                        self._update_status("error", error_message="No files provided")
-                        self._add_log(
-                            "error", "No files provided for custom dataset", "load"
+                        self._update_status(
+                            "error",
+                            error_message="No files provided",
                         )
-                        response.message = "No files provided for custom dataset"
+                        self._add_log(
+                            "error",
+                            "No files provided for custom dataset",
+                            "load",
+                        )
+                        response.message = (
+                            "No files provided for custom dataset"
+                        )
                         return response
-                    self._update_status("running", "Loading custom data", 0.2)
-                    self._add_log(
-                        "info", f"Loading {len(request.files)} custom files", "load"
+                    self._update_status(
+                        "running",
+                        "Loading custom data",
+                        0.2,
                     )
-                    self._load_custom_data(engine, request.files, response, "replace")
+                    self._add_log(
+                        "info",
+                        f"Loading {len(request.files)} custom files",
+                        "load",
+                    )
+                    self._load_custom_data(
+                        engine,
+                        request.files,
+                        response,
+                        "replace",
+                    )
                 else:
                     self._update_status(
                         "error",
-                        error_message=f"Replace mode only supports custom dataset source",
+                        error_message=(
+                            "Replace mode only supports custom dataset source"
+                        ),
                     )
                     self._add_log(
                         "error",
-                        f"Replace mode only supports custom dataset source",
+                        "Replace mode only supports custom dataset source",
                         "initialization",
                     )
                     response.message = (
-                        f"Replace mode only supports custom dataset source"
+                        "Replace mode only supports custom dataset source"
                     )
                     return response
 
             elif request.import_mode == "append":
                 # Import data without clearing, skip duplicates
                 if request.dataset_source == "sample":
-                    self._update_status("running", "Loading sample data", 0.2)
+                    self._update_status(
+                        "running",
+                        "Loading sample data",
+                        0.2,
+                    )
                     self._add_log(
-                        "info", "Loading sample dataset in append mode", "load"
+                        "info",
+                        "Loading sample dataset in append mode",
+                        "load",
                     )
                     self._load_sample_data(engine, response, "append")
                 elif request.dataset_source == "custom":
                     if not request.files:
-                        self._update_status("error", error_message="No files provided")
-                        self._add_log(
-                            "error", "No files provided for custom dataset", "load"
+                        self._update_status(
+                            "error",
+                            error_message="No files provided",
                         )
-                        response.message = "No files provided for custom dataset"
+                        self._add_log(
+                            "error",
+                            "No files provided for custom dataset",
+                            "load",
+                        )
+                        response.message = (
+                            "No files provided for custom dataset"
+                        )
                         return response
-                    self._update_status("running", "Loading custom data", 0.2)
+                    self._update_status(
+                        "running",
+                        "Loading custom data",
+                        0.2,
+                    )
                     self._add_log(
                         "info",
-                        f"Loading {len(request.files)} custom files in append mode",
+                        (
+                            f"Loading {len(request.files)} custom files "
+                            "in append mode"
+                        ),
                         "load",
                     )
-                    self._load_custom_data(engine, request.files, response, "append")
+                    self._load_custom_data(
+                        engine,
+                        request.files,
+                        response,
+                        "append",
+                    )
                 else:
                     self._update_status(
                         "error",
-                        error_message=f"Invalid dataset source: {request.dataset_source}",
+                        error_message=(
+                            f"Invalid dataset source: {request.dataset_source}"
+                        ),
                     )
                     self._add_log(
                         "error",
@@ -420,14 +516,19 @@ class ETLService:
 
             else:
                 self._update_status(
-                    "error", error_message=f"Invalid import mode: {request.import_mode}"
+                    "error",
+                    error_message=(
+                        f"Invalid import mode: {request.import_mode}"
+                    ),
                 )
                 self._add_log(
                     "error",
                     f"Invalid import mode: {request.import_mode}",
                     "initialization",
                 )
-                response.message = f"Invalid import mode: {request.import_mode}"
+                response.message = (
+                    f"Invalid import mode: {request.import_mode}"
+                )
                 return response
 
             # Calculate total
@@ -444,7 +545,10 @@ class ETLService:
             self._update_status("completed", "Completed", 1.0)
             self._add_log(
                 "info",
-                f"ETL pipeline completed. {response.total_records_processed} records processed.",
+                (
+                    "ETL pipeline completed. "
+                    f"{response.total_records_processed} records processed."
+                ),
                 "completion",
             )
 
@@ -474,15 +578,20 @@ class ETLService:
                     "customers_imported": response.customers_inserted,
                     "products_imported": response.products_inserted,
                     "orders_imported": response.orders_inserted,
-                    "records_skipped": response.customers_skipped
-                    + response.products_skipped
-                    + response.orders_skipped,
-                    "completed_at": datetime.now().isoformat(),
+                    "records_skipped": (
+                        response.customers_skipped
+                        + response.products_skipped
+                        + response.orders_skipped
+                    ),
+                    "completed_at": (
+                        datetime.now().isoformat()
+                    ),
                 },
                 last_successful_import_timestamp=datetime.now(),
             )
 
-            # Delete uploaded files after successful import if archive mode is not enabled
+            # Delete uploaded files after successful import if archive mode
+            # is not enabled
             if (
                 request.dataset_source == "custom"
                 and request.files
@@ -490,7 +599,9 @@ class ETLService:
             ):
                 self._delete_uploaded_files(request.files)
                 self._add_log(
-                    "info", "Uploaded files deleted after successful import", "cleanup"
+                    "info",
+                    "Uploaded files deleted after successful import",
+                    "cleanup",
                 )
 
             return response
@@ -524,7 +635,9 @@ class ETLService:
                     try:
                         os.remove(file_path)
                         self._add_log(
-                            "info", f"Deleted uploaded file: {saved_as}", "cleanup"
+                            "info",
+                            f"Deleted uploaded file: {saved_as}",
+                            "cleanup",
                         )
                     except Exception as e:
                         self._add_log(
@@ -609,7 +722,9 @@ class ETLService:
 
         # Get existing primary keys from database
         with engine.connect() as conn:
-            result = conn.execute(text(f"SELECT {pk_column} FROM {table_name}"))
+            result = conn.execute(
+                text(f"SELECT {pk_column} FROM {table_name}")
+            )
             existing_keys = set(row[0] for row in result)
 
         # Filter out rows with existing primary keys
@@ -618,14 +733,21 @@ class ETLService:
 
         # Insert only new records
         if len(df_to_insert) > 0:
-            df_to_insert.to_sql(table_name, engine, if_exists="append", index=False)
+            df_to_insert.to_sql(
+                table_name,
+                engine,
+                if_exists="append",
+                index=False,
+            )
             inserted = len(df_to_insert)
 
         skipped = len(df_to_skip)
 
         if skipped > 0:
             self._add_log(
-                "info", f"Skipped {skipped} duplicate records in {table_name}", "load"
+                "info",
+                f"Skipped {skipped} duplicate records in {table_name}",
+                "load",
             )
 
         return inserted, skipped
@@ -655,7 +777,11 @@ class ETLService:
 
             file_path = os.path.join(self.upload_dir, saved_as)
             if not os.path.exists(file_path):
-                self._add_log("warning", f"File not found: {saved_as}", "load")
+                self._add_log(
+                    "warning",
+                    f"File not found: {saved_as}",
+                    "load",
+                )
                 continue
 
             # Determine table name based on original filename
@@ -666,10 +792,18 @@ class ETLService:
             elif "order" in original_name.lower():
                 table_name = "orders"
             else:
-                self._add_log("warning", f"Unknown file type: {original_name}", "load")
+                self._add_log(
+                    "warning",
+                    f"Unknown file type: {original_name}",
+                    "load",
+                )
                 continue
 
-            self._add_log("info", f"Loading {original_name} into {table_name}", "load")
+            self._add_log(
+                "info",
+                f"Loading {original_name} into {table_name}",
+                "load",
+            )
             df = pd.read_csv(file_path)
             # Calculate total_amount for orders if not present
             if (

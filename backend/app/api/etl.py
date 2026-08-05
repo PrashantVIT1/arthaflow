@@ -120,7 +120,8 @@ async def get_etl_state():
     Get persistent ETL pipeline state.
 
     Returns:
-        ETLState with current pipeline state including dataset source, import mode, uploaded files, and last execution details
+        ETLState with current pipeline state including dataset source,
+        import mode, uploaded files, and last execution details
     """
     try:
         service = ETLService()

@@ -16,7 +16,7 @@ load_dotenv(env_path)
 backend_dir = Path(__file__).resolve().parent
 sys.path.insert(0, str(backend_dir))
 
-from app.etl import ETLPipeline
+from app.etl import ETLPipeline  # noqa: E402
 
 
 def main():

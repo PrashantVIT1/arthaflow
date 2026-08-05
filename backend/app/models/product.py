@@ -1,4 +1,4 @@
-from sqlalchemy import Column, DateTime, Float, Index, Integer, String
+from sqlalchemy import Column, DateTime, Float, Integer, String
 from sqlalchemy.sql import func
 
 from app.database.config import Base
@@ -20,4 +20,7 @@ class Product(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     def __repr__(self):
-        return f"<Product(id={self.id}, name={self.name}, category={self.category}, price={self.price})>"
+        return (
+            "<Product(id={self.id}, name={self.name}, "
+            "category={self.category}, price={self.price})>"
+        )

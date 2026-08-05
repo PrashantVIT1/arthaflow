@@ -16,13 +16,13 @@ if not os.getenv("DATABASE_URL"):
         "postgresql://postgres:1234567890@localhost:5432/insightflow"
     )
 
-import random
-from datetime import datetime, timedelta
+import random  # noqa: E402
+from datetime import datetime, timedelta  # noqa: E402
 
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session  # noqa: E402
 
-from app.database.config import SessionLocal, engine
-from app.models import Customer, Order, Product
+from app.database.config import SessionLocal  # noqa: E402
+from app.models import Customer, Order, Product  # noqa: E402
 
 
 def seed_customers(db: Session):

@@ -81,8 +81,16 @@ def export_customers_csv(db: Session = Depends(get_db)):
                         if customer.last_order_date
                         else ""
                     ),
-                    customer.created_at.isoformat() if customer.created_at else "",
-                    customer.updated_at.isoformat() if customer.updated_at else "",
+                    (
+                        customer.created_at.isoformat()
+                        if customer.created_at
+                        else ""
+                    ),
+                    (
+                        customer.updated_at.isoformat()
+                        if customer.updated_at
+                        else ""
+                    ),
                 ]
             )
 
@@ -91,7 +99,9 @@ def export_customers_csv(db: Session = Depends(get_db)):
         return StreamingResponse(
             io.BytesIO(output.getvalue().encode("utf-8")),
             media_type="text/csv",
-            headers={"Content-Disposition": 'attachment; filename="customers.csv"'},
+            headers={
+                "Content-Disposition": 'attachment; filename="customers.csv"'
+            },
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

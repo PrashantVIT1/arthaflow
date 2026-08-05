@@ -7,12 +7,12 @@ from fastapi.middleware.cors import CORSMiddleware
 # Load environment variables BEFORE importing database config
 load_dotenv()
 
-from app.api.analytics import router as analytics_router
-from app.api.customers import router as customers_router
-from app.api.etl import router as etl_router
-from app.api.orders import router as orders_router
-from app.api.pipeline import router as pipeline_router
-from app.database.config import Base, get_engine
+from app.api.analytics import router as analytics_router  # noqa: E402
+from app.api.customers import router as customers_router  # noqa: E402
+from app.api.etl import router as etl_router  # noqa: E402
+from app.api.orders import router as orders_router  # noqa: E402
+from app.api.pipeline import router as pipeline_router  # noqa: E402
+from app.database.config import Base, get_engine  # noqa: E402
 
 app = FastAPI(
     title="ArthaFlow API",
@@ -23,7 +23,9 @@ app = FastAPI(
 # CORS Configuration - Read from environment variable or use default
 frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5174")
 
-origins = frontend_url.split(",") if frontend_url else ["http://localhost:5174"]
+origins = (
+    frontend_url.split(",") if frontend_url else ["http://localhost:5174"]
+)
 
 app.add_middleware(
     CORSMiddleware,

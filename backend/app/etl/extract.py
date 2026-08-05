@@ -1,7 +1,7 @@
 """Extract module for reading CSV files."""
 
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict
 
 import pandas as pd
 
@@ -15,7 +15,9 @@ class Extractor:
         """Initialize extractor with configuration."""
         self.config = config or ETLConfig()
 
-    def read_csv(self, file_path: Path, dtype: Dict[str, str] = None) -> pd.DataFrame:
+    def read_csv(
+        self, file_path: Path, dtype: Dict[str, str] = None
+    ) -> pd.DataFrame:
         """
         Read CSV file into DataFrame.
 

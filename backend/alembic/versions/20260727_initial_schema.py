@@ -1,7 +1,7 @@
 """Initial schema for retail analytics platform
 
 Revision ID: 001
-Revises: 
+Revises:
 Create Date: 2026-07-27
 
 """
@@ -38,7 +38,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_customers_id"), "customers", ["id"], unique=False)
-    op.create_index(op.f("ix_customers_email"), "customers", ["email"], unique=True)
+    op.create_index(
+        op.f("ix_customers_email"), "customers", ["email"], unique=True
+    )
 
     # Create products table
     op.create_table(
@@ -113,7 +115,9 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_orders_order_date"), "orders", ["order_date"], unique=False
     )
-    op.create_index(op.f("ix_orders_region"), "orders", ["region"], unique=False)
+    op.create_index(
+        op.f("ix_orders_region"), "orders", ["region"], unique=False
+    )
 
 
 def downgrade() -> None:
