@@ -753,7 +753,37 @@ class ETLService:
                 f"Loading {original_name} into {table_name}",
                 "load",
             )
-            df = pd.read_csv(file_path)
+
+            # Detect file type and use appropriate parser
+            file_ext = os.path.splitext(saved_as)[1].lower()
+            self._add_log("info", f"Detected file type: {file_ext}", "load")
+
+            try:
+                if file_ext == ".json":
+                    df = pd.read_json(file_path)
+                    self._add_log("info", f"Parsed JSON file with {len(df)} rows", "load")
+                elif file_ext == ".csv":
+                    df = pd.read_csv(file_path)
+                    self._add_log("info", f"Parsed CSV file with {len(df)} rows", "load")
+                else:
+                    self._add_log("error", f"Unsupported file type: {file_ext}", "load")
+                    raise ValueError(
+                        f"Unsupported file type: {file_ext}. Only .csv and .json are supported."
+                    )
+            except ValueError as e:
+                self._add_log("error", f"File type error: {str(e)}", "load")
+                raise
+            except pd.errors.JSONDecodeError as e:
+                self._add_log("error", f"Invalid JSON syntax in {original_name}: {str(e)}", "load")
+                raise ValueError(f"Invalid JSON syntax in {original_name}: {str(e)}")
+            except pd.errors.ParserError as e:
+                self._add_log("error", f"Parse error in {original_name}: {str(e)}", "load")
+                raise ValueError(f"Parse error in {original_name}: {str(e)}")
+            except Exception as e:
+                self._add_log(
+                    "error", f"Unexpected error reading {original_name}: {str(e)}", "load"
+                )
+                raise
             # Calculate total_amount for orders if not present
             if (
                 table_name == "orders"

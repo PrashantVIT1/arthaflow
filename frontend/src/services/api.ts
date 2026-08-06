@@ -311,6 +311,19 @@ export const pipelineApi = {
     const response = await api.get('/pipeline/sample-dataset');
     return response.data;
   },
+
+  downloadSampleData: async (tableName: 'customers' | 'products' | 'orders', format: 'csv' | 'json'): Promise<void> => {
+    const response = await api.get(`/pipeline/sample-data/${tableName}/${format}`, { responseType: 'blob' });
+    
+    const mimeType = format === 'csv' ? 'text/csv' : 'application/json';
+    const blob = new Blob([response.data], { type: mimeType });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `sample_${tableName}.${format}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  },
 };
 
 export const etlApi = {

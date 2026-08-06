@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Card from '../components/ui/Card';
-import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check } from 'lucide-react';
+import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check, Download, ChevronDown } from 'lucide-react';
 import { pipelineApi, etlApi, SampleDatasetMetadata, UploadResponse, ETLRunResponse } from '../services/api';
 import { useETL } from '../context/ETLContext';
 
@@ -34,6 +34,11 @@ const DataPipeline: React.FC = () => {
   const [uploadResponse, setUploadResponse] = useState<UploadResponse | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [customPipelineResult, setCustomPipelineResult] = useState<ETLRunResponse | null>(null);
+
+  // Sample data download state
+  const [downloadingSample, setDownloadingSample] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [openDropdown, setOpenDropdown] = useState<'customers' | 'products' | 'orders' | null>(null);
 
   useEffect(() => {
     const fetchSampleMetadata = async () => {
@@ -353,6 +358,48 @@ const DataPipeline: React.FC = () => {
       setArchiveVerificationError(null);
     }
   };
+
+  const handleDownloadSampleData = async (tableName: 'customers' | 'products' | 'orders', format: 'csv' | 'json') => {
+    setDownloadingSample(true);
+    setDownloadError(null);
+    setOpenDropdown(null);
+    try {
+      await pipelineApi.downloadSampleData(tableName, format);
+    } catch (error) {
+      console.error('Failed to download sample data:', error);
+      setDownloadError(`Failed to download sample ${tableName}.${format}. Please try again.`);
+    } finally {
+      setDownloadingSample(false);
+    }
+  };
+
+  const toggleDropdown = (dropdown: 'customers' | 'products' | 'orders') => {
+    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (openDropdown && !(event.target as HTMLElement).closest('.dropdown-container')) {
+        setOpenDropdown(null);
+      }
+    };
+
+    // Close dropdown on ESC key
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && openDropdown) {
+        setOpenDropdown(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [openDropdown]);
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -409,28 +456,117 @@ const DataPipeline: React.FC = () => {
                       <p className="text-xs text-gray-500 ml-6">{sampleMetadata.description}</p>
                     )}
                     <div className="grid grid-cols-3 gap-4 mt-4">
-                      <div className="flex items-center space-x-2">
-                        <Users className="w-4 h-4 text-blue-500" />
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.customers}</div>
-                          <div className="text-xs text-gray-500">Customers</div>
-                        </div>
+                      <div className="dropdown-container relative">
+                        <button
+                          onClick={() => toggleDropdown('customers')}
+                          className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Users className="w-4 h-4 text-blue-500" />
+                            <div>
+                              <div className="text-lg font-semibold text-gray-900">{sampleMetadata.customers}</div>
+                              <div className="text-xs text-gray-500">Customers</div>
+                            </div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        </button>
+                        {openDropdown === 'customers' && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            <button
+                              onClick={() => handleDownloadSampleData('customers', 'csv')}
+                              disabled={downloadingSample}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download CSV</span>
+                            </button>
+                            <button
+                              onClick={() => handleDownloadSampleData('customers', 'json')}
+                              disabled={downloadingSample}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download JSON</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <Package className="w-4 h-4 text-green-500" />
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.products}</div>
-                          <div className="text-xs text-gray-500">Products</div>
-                        </div>
+                      <div className="dropdown-container relative">
+                        <button
+                          onClick={() => toggleDropdown('products')}
+                          className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <Package className="w-4 h-4 text-green-500" />
+                            <div>
+                              <div className="text-lg font-semibold text-gray-900">{sampleMetadata.products}</div>
+                              <div className="text-xs text-gray-500">Products</div>
+                            </div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        </button>
+                        {openDropdown === 'products' && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            <button
+                              onClick={() => handleDownloadSampleData('products', 'csv')}
+                              disabled={downloadingSample}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download CSV</span>
+                            </button>
+                            <button
+                              onClick={() => handleDownloadSampleData('products', 'json')}
+                              disabled={downloadingSample}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download JSON</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <ShoppingCart className="w-4 h-4 text-purple-500" />
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.orders}</div>
-                          <div className="text-xs text-gray-500">Orders</div>
-                        </div>
+                      <div className="dropdown-container relative">
+                        <button
+                          onClick={() => toggleDropdown('orders')}
+                          className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                        >
+                          <div className="flex items-center space-x-2">
+                            <ShoppingCart className="w-4 h-4 text-purple-500" />
+                            <div>
+                              <div className="text-lg font-semibold text-gray-900">{sampleMetadata.orders}</div>
+                              <div className="text-xs text-gray-500">Orders</div>
+                            </div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        </button>
+                        {openDropdown === 'orders' && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+                            <button
+                              onClick={() => handleDownloadSampleData('orders', 'csv')}
+                              disabled={downloadingSample}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download CSV</span>
+                            </button>
+                            <button
+                              onClick={() => handleDownloadSampleData('orders', 'json')}
+                              disabled={downloadingSample}
+                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              <Download className="w-3 h-3" />
+                              <span>Download JSON</span>
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
+                    {downloadError && (
+                      <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
+                        <p className="text-xs text-red-600">{downloadError}</p>
+                      </div>
+                    )}
                     <button 
                       onClick={handleRunPipeline}
                       disabled={runningPipeline}
@@ -539,101 +675,100 @@ const DataPipeline: React.FC = () => {
         )}
 
         {datasetSource === 'custom' && importMode !== 'clear' && (
-          <Card title="Dataset Upload" subtitle="Upload data files for processing" className="transition-all duration-200">
-            <div className="">
-              <div
-                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                  isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
-                }`}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                <p className="text-sm text-gray-600 mb-4">
-                  Drag and drop files here, or{' '}
-                  <label className="text-blue-600 cursor-pointer hover:underline">
-                    browse
-                    <input
-                      type="file"
-                      className="hidden"
-                      accept=".csv,.json"
-                      multiple
-                      ref={fileInputRef}
-                      onChange={(e) => handleFileSelect(e.target.files)}
-                    />
-                  </label>
-                </p>
-                <p className="text-xs text-gray-500">Accepts CSV and JSON files</p>
-                {uploading && (
-                  <p className="text-xs text-blue-600 mt-2">Uploading files...</p>
-                )}
-                {uploadResponse && (
-                  <div className="mt-2 text-xs text-green-600">
-                    <p>Uploaded {uploadResponse.uploadedFiles.length} file(s):</p>
-                    <ul className="list-disc list-inside">
-                      {uploadResponse.uploadedFiles.map((file, idx) => (
-                        <li key={idx}>{file.originalName} ({file.size} bytes)</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {uploadError && (
-                  <p className="text-xs text-red-600 mt-2">{uploadError}</p>
-                )}
-              </div>
-
-              {!uploadResponse && !uploading && (
-                <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center">
-                  <p className="text-sm text-gray-500">No custom dataset uploaded yet.</p>
-                </div>
-              )}
-
-              {uploadResponse && uploadResponse.uploadedFiles.length > 0 && (
-                <div className="mt-4">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">File Name</th>
-                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Size</th>
-                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Saved As</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {uploadResponse.uploadedFiles.map((file, idx) => (
-                        <tr key={idx} className="border-b border-gray-100">
-                          <td className="py-2 px-3 text-sm text-gray-900 flex items-center">
-                            <FileIcon className="w-4 h-4 mr-2 text-gray-400" />
-                            {file.originalName}
-                          </td>
-                          <td className="py-2 px-3 text-sm text-gray-600">{file.size} bytes</td>
-                          <td className="py-2 px-3 text-sm text-gray-600">{file.savedAs}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  <button 
-                    onClick={handleRunPipeline}
-                    disabled={runningPipeline || (datasetSource === 'custom' && (!uploadResponse || uploadResponse.uploadedFiles.length === 0))}
-                    className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
-                  >
-                    {runningPipeline ? 'Running Pipeline...' : 'Run ETL Pipeline'}
-                  </button>
-                  {customPipelineResult && (
-                    <div className={`mt-4 p-3 rounded-lg text-sm ${
-                      customPipelineResult.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-                    }`}>
-                      {customPipelineResult.message}
+          <>
+            <Card title="Dataset Upload" subtitle="Upload data files for processing" className="transition-all duration-200">
+              <div className="">
+                <div
+                  className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                    isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <Upload className="w-12 h-12 mx-auto mb-4 text-gray-400" />
+                  <p className="text-sm text-gray-600 mb-4">
+                    Drag and drop files here, or{' '}
+                    <label className="text-blue-600 cursor-pointer hover:underline">
+                      browse
+                      <input
+                        type="file"
+                        className="hidden"
+                        accept=".csv,.json"
+                        multiple
+                        ref={fileInputRef}
+                        onChange={(e) => handleFileSelect(e.target.files)}
+                      />
+                    </label>
+                  </p>
+                  <p className="text-xs text-gray-500">Accepts CSV and JSON files</p>
+                  {uploading && (
+                    <p className="text-xs text-blue-600 mt-2">Uploading files...</p>
+                  )}
+                  {uploadResponse && (
+                    <div className="mt-2 text-xs text-green-600">
+                      <p>Uploaded {uploadResponse.uploadedFiles.length} file(s):</p>
+                      <ul className="list-disc list-inside">
+                        {uploadResponse.uploadedFiles.map((file, idx) => (
+                          <li key={idx}>{file.originalName} ({file.size} bytes)</li>
+                        ))}
+                      </ul>
                     </div>
                   )}
+                  {uploadError && (
+                    <p className="text-xs text-red-600 mt-2">{uploadError}</p>
+                  )}
                 </div>
-              )}
-            </div>
-          </Card>
-        )}
 
-        {datasetSource === 'custom' && importMode !== 'clear' && (
-          <Card title="Uploaded File Retention" subtitle="Choose whether to delete or archive uploaded files after successful import" className="transition-all duration-200">
+                {!uploadResponse && !uploading && (
+                  <div className="mt-4 p-4 bg-gray-50 rounded-lg text-center">
+                    <p className="text-sm text-gray-500">No custom dataset uploaded yet.</p>
+                  </div>
+                )}
+
+                {uploadResponse && uploadResponse.uploadedFiles.length > 0 && (
+                  <div className="mt-4">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">File Name</th>
+                          <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Size</th>
+                          <th className="text-left py-2 px-3 text-xs font-medium text-gray-500 uppercase">Saved As</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {uploadResponse.uploadedFiles.map((file, idx) => (
+                          <tr key={idx} className="border-b border-gray-100">
+                            <td className="py-2 px-3 text-sm text-gray-900 flex items-center">
+                              <FileIcon className="w-4 h-4 mr-2 text-gray-400" />
+                              {file.originalName}
+                            </td>
+                            <td className="py-2 px-3 text-sm text-gray-600">{file.size} bytes</td>
+                            <td className="py-2 px-3 text-sm text-gray-600">{file.savedAs}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <button 
+                      onClick={handleRunPipeline}
+                      disabled={runningPipeline || (datasetSource === 'custom' && (!uploadResponse || uploadResponse.uploadedFiles.length === 0))}
+                      className="mt-4 w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    >
+                      {runningPipeline ? 'Running Pipeline...' : 'Run ETL Pipeline'}
+                    </button>
+                    {customPipelineResult && (
+                      <div className={`mt-4 p-3 rounded-lg text-sm ${
+                        customPipelineResult.success ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
+                      }`}>
+                        {customPipelineResult.message}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            <Card title="Uploaded File Retention" subtitle="Choose whether to delete or archive uploaded files after successful import" className="transition-all duration-200">
             <div className="space-y-4">
               <div className="flex items-center space-x-3">
                 <input
@@ -703,6 +838,7 @@ const DataPipeline: React.FC = () => {
               )}
             </div>
           </Card>
+          </>
         )}
 
         {datasetSource === 'custom' && importMode === 'clear' && (
