@@ -17,7 +17,11 @@ def get_engine():
     """Get or create database engine."""
     global _engine
     if _engine is None:
-        _engine = create_engine(DATABASE_URL)
+        _engine = create_engine(
+            DATABASE_URL,
+            pool_pre_ping=True,  # Test connections before using them from pool
+            pool_recycle=3600,  # Recycle connections after 1 hour (Render's typical idle timeout)
+        )
     return _engine
 
 
