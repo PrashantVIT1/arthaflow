@@ -288,18 +288,21 @@ const DataPipeline: React.FC = () => {
     setShowClearConfirm(false);
     setRunningPipeline(true);
     setCustomPipelineResult(null);
+    setSamplePipelineResult(null);
     setEtlStatus(null);
     setEtlLogs(null);
-    
+    resetPipelineState();
+
     try {
       const request = {
         dataset_source: 'sample', // Clear mode doesn't need dataset source, but backend expects it
         import_mode: 'clear',
         files: undefined
       };
-      
+
       const response = await etlApi.runPipeline(request);
       setCustomPipelineResult(response);
+      setRunningPipeline(false);
       console.log('Clear result:', response);
     } catch (error) {
       console.error('Failed to clear dataset:', error);
@@ -920,32 +923,35 @@ const DataPipeline: React.FC = () => {
           )}
         </Card>
 
-        <Card title="Pipeline Progress" subtitle="Track ETL pipeline progress">
-          {etlStatus && etlStatus.progress !== undefined ? (
-            <div className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-gray-700">Progress</span>
-                <span className="text-sm text-gray-600">{Math.round((etlStatus.progress || 0) * 100)}%</span>
+        {(runningPipeline ||
+          (importMode !== 'clear' && ((samplePipelineResult && samplePipelineResult.success) || (customPipelineResult && customPipelineResult.success)))) && (
+          <Card title="Pipeline Progress" subtitle="Track ETL pipeline progress">
+            {etlStatus && etlStatus.progress !== undefined ? (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-gray-700">Progress</span>
+                  <span className="text-sm text-gray-600">{Math.round((etlStatus.progress || 0) * 100)}%</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-4">
+                  <div
+                    className="bg-blue-600 h-4 rounded-full transition-all duration-300"
+                    style={{ width: `${(etlStatus.progress || 0) * 100}%` }}
+                  />
+                </div>
+                {etlStatus.current_stage && (
+                  <p className="text-sm text-gray-600 text-center">{etlStatus.current_stage}</p>
+                )}
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-4">
-                <div 
-                  className="bg-blue-600 h-4 rounded-full transition-all duration-300"
-                  style={{ width: `${(etlStatus.progress || 0) * 100}%` }}
-                />
+            ) : (
+              <div className="flex items-center justify-center h-48 text-gray-400">
+                <div className="text-center">
+                  <BarChart3 className="w-12 h-12 mx-auto mb-4" />
+                  <p className="text-sm">No progress data</p>
+                </div>
               </div>
-              {etlStatus.current_stage && (
-                <p className="text-sm text-gray-600 text-center">{etlStatus.current_stage}</p>
-              )}
-            </div>
-          ) : (
-            <div className="flex items-center justify-center h-48 text-gray-400">
-              <div className="text-center">
-                <BarChart3 className="w-12 h-12 mx-auto mb-4" />
-                <p className="text-sm">No progress data</p>
-              </div>
-            </div>
-          )}
-        </Card>
+            )}
+          </Card>
+        )}
 
         <Card title="Execution Logs" subtitle="View pipeline execution logs">
           {etlLogs && etlLogs.logs.length > 0 ? (
