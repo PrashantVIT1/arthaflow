@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import * as d3 from 'd3';
 
@@ -32,41 +32,9 @@ const ProductDistributionPieChart: React.FC<ProductDistributionPieChartProps> = 
 
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
-
   const colorScale = d3.scaleOrdinal()
     .domain(data.map((d) => d.label))
     .range(['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#06b6d4', '#84cc16']);
-
-
-
-  useEffect(() => {
-
-    if (!containerRef.current) return;
-
-
-
-    const resizeObserver = new ResizeObserver((entries) => {
-
-      for (const entry of entries) {
-
-        const { width, height } = entry.contentRect;
-
-        setDimensions({ width, height });
-
-      }
-
-    });
-
-
-
-    resizeObserver.observe(containerRef.current);
-
-    return () => resizeObserver.disconnect();
-
-  }, []);
 
 
 
@@ -84,22 +52,18 @@ const ProductDistributionPieChart: React.FC<ProductDistributionPieChartProps> = 
 
     const margin = { top: 30, right: 20, bottom: 30, left: 20 };
 
-    const width = dimensions.width - margin.left - margin.right;
+    const fixedWidth = 800;
+    const fixedHeight = 400;
 
-    const height = dimensions.height - margin.top - margin.bottom;
+    const width = fixedWidth - margin.left - margin.right;
+    const height = fixedHeight - margin.top - margin.bottom;
 
     const radius = Math.min(width, height) / 2 * 0.8;
 
-
-
     const g = svg
-
-      .attr('width', width + margin.left + margin.right)
-
-      .attr('height', height + margin.top + margin.bottom)
-
+      .attr('viewBox', `0 0 ${fixedWidth} ${fixedHeight}`)
+      .attr('preserveAspectRatio', 'none')
       .append('g')
-
       .attr('transform', `translate(${margin.left + width / 2},${margin.top + height / 2})`);
 
 
@@ -261,32 +225,35 @@ const ProductDistributionPieChart: React.FC<ProductDistributionPieChartProps> = 
 
 
   if (loading) {
-
     return (
-
       <Card>
-
         <div className="animate-pulse">
-
           <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-
           <div className="h-64 bg-gray-200 rounded"></div>
-
         </div>
-
       </Card>
-
     );
+  }
 
+  if (!data || data.length === 0) {
+    return (
+      <Card title="Product Distribution" subtitle="Distribution by category or metric">
+        <div className="w-full" style={{ height: '400px' }}>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500 text-sm">No data available</p>
+          </div>
+        </div>
+      </Card>
+    );
   }
 
 
 
   return (
     <Card title="Product Distribution" subtitle="Distribution by category or metric">
-      <div className="w-full overflow-x-auto overflow-y-hidden" style={{ height: '400px' }}>
-        <div className="flex flex-col" style={{ minWidth: '600px', height: '100%' }}>
-          <div ref={containerRef} style={{ flex: 1, minHeight: 0 }}>
+      <div className="w-full" style={{ height: '400px' }}>
+        <div className="flex flex-col" style={{ width: '100%', height: '100%' }}>
+          <div style={{ flex: 1, minHeight: 0 }}>
             <svg ref={svgRef} style={{ width: '100%', height: '100%' }}></svg>
           </div>
           <div 

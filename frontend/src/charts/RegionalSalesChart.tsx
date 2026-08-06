@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import * as d3 from 'd3';
 
@@ -22,38 +22,6 @@ const RegionalSalesChart: React.FC<RegionalSalesChartProps> = ({ data, loading =
 
   const svgRef = useRef<SVGSVGElement>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
-
-
-
-  useEffect(() => {
-
-    if (!containerRef.current) return;
-
-
-
-    const resizeObserver = new ResizeObserver((entries) => {
-
-      for (const entry of entries) {
-
-        const { width, height } = entry.contentRect;
-
-        setDimensions({ width, height });
-
-      }
-
-    });
-
-
-
-    resizeObserver.observe(containerRef.current);
-
-    return () => resizeObserver.disconnect();
-
-  }, []);
-
 
 
   useEffect(() => {
@@ -68,24 +36,18 @@ const RegionalSalesChart: React.FC<RegionalSalesChartProps> = ({ data, loading =
 
 
 
-    const margin = dimensions.width < 400 
-      ? { top: 20, right: 10, bottom: 30, left: 60 }
-      : { top: 30, right: 20, bottom: 40, left: 80 };
+    const margin = { top: 30, right: 20, bottom: 40, left: 80 };
 
-    const width = dimensions.width - margin.left - margin.right;
+    const fixedWidth = 800;
+    const fixedHeight = 400;
 
-    const height = dimensions.height - margin.top - margin.bottom;
-
-
+    const width = fixedWidth - margin.left - margin.right;
+    const height = fixedHeight - margin.top - margin.bottom;
 
     const g = svg
-
-      .attr('width', width + margin.left + margin.right)
-
-      .attr('height', height + margin.top + margin.bottom)
-
+      .attr('viewBox', `0 0 ${fixedWidth} ${fixedHeight}`)
+      .attr('preserveAspectRatio', 'none')
       .append('g')
-
       .attr('transform', `translate(${margin.left},${margin.top})`);
 
 
@@ -279,33 +241,34 @@ const RegionalSalesChart: React.FC<RegionalSalesChartProps> = ({ data, loading =
 
 
   if (loading) {
-
     return (
-
       <Card>
-
         <div className="animate-pulse">
-
           <div className="h-4 bg-gray-200 rounded w-1/3 mb-4"></div>
-
           <div className="h-64 bg-gray-200 rounded"></div>
-
         </div>
-
       </Card>
-
     );
+  }
 
+  if (!data || data.length === 0) {
+    return (
+      <Card title="Sales by Region" subtitle="Revenue breakdown by geographic region">
+        <div className="w-full" style={{ height: '400px' }}>
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500 text-sm">No data available</p>
+          </div>
+        </div>
+      </Card>
+    );
   }
 
 
 
   return (
     <Card title="Sales by Region" subtitle="Revenue breakdown by geographic region">
-      <div className="w-full overflow-x-auto overflow-y-hidden" style={{ height: '400px' }}>
-        <div ref={containerRef} style={{ minWidth: '600px', height: '100%' }}>
-          <svg ref={svgRef} style={{ width: '100%', height: '100%' }}></svg>
-        </div>
+      <div className="w-full" style={{ height: '400px' }}>
+        <svg ref={svgRef} style={{ width: '100%', height: '100%' }}></svg>
       </div>
     </Card>
   );
