@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Card from '../components/ui/Card';
-import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check, Download, ChevronDown } from 'lucide-react';
+import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check } from 'lucide-react';
 import { pipelineApi, etlApi, SampleDatasetMetadata, UploadResponse, ETLRunResponse } from '../services/api';
 import { useETL } from '../context/ETLContext';
 
@@ -34,11 +34,6 @@ const DataPipeline: React.FC = () => {
   const [uploadResponse, setUploadResponse] = useState<UploadResponse | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [customPipelineResult, setCustomPipelineResult] = useState<ETLRunResponse | null>(null);
-
-  // Sample data download state
-  const [downloadingSample, setDownloadingSample] = useState(false);
-  const [downloadError, setDownloadError] = useState<string | null>(null);
-  const [openDropdown, setOpenDropdown] = useState<'customers' | 'products' | 'orders' | null>(null);
 
   useEffect(() => {
     const fetchSampleMetadata = async () => {
@@ -362,47 +357,6 @@ const DataPipeline: React.FC = () => {
     }
   };
 
-  const handleDownloadSampleData = async (tableName: 'customers' | 'products' | 'orders', format: 'csv' | 'json') => {
-    setDownloadingSample(true);
-    setDownloadError(null);
-    setOpenDropdown(null);
-    try {
-      await pipelineApi.downloadSampleData(tableName, format);
-    } catch (error) {
-      console.error('Failed to download sample data:', error);
-      setDownloadError(`Failed to download sample ${tableName}.${format}. Please try again.`);
-    } finally {
-      setDownloadingSample(false);
-    }
-  };
-
-  const toggleDropdown = (dropdown: 'customers' | 'products' | 'orders') => {
-    setOpenDropdown(openDropdown === dropdown ? null : dropdown);
-  };
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (openDropdown && !(event.target as HTMLElement).closest('.dropdown-container')) {
-        setOpenDropdown(null);
-      }
-    };
-
-    // Close dropdown on ESC key
-    const handleEscapeKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && openDropdown) {
-        setOpenDropdown(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscapeKey);
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscapeKey);
-    };
-  }, [openDropdown]);
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -459,117 +413,28 @@ const DataPipeline: React.FC = () => {
                       <p className="text-xs text-gray-500 ml-6">{sampleMetadata.description}</p>
                     )}
                     <div className="grid grid-cols-3 gap-4 mt-4">
-                      <div className="dropdown-container relative">
-                        <button
-                          onClick={() => toggleDropdown('customers')}
-                          className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Users className="w-4 h-4 text-blue-500" />
-                            <div>
-                              <div className="text-lg font-semibold text-gray-900">{sampleMetadata.customers}</div>
-                              <div className="text-xs text-gray-500">Customers</div>
-                            </div>
-                          </div>
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        </button>
-                        {openDropdown === 'customers' && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                            <button
-                              onClick={() => handleDownloadSampleData('customers', 'csv')}
-                              disabled={downloadingSample}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Download CSV</span>
-                            </button>
-                            <button
-                              onClick={() => handleDownloadSampleData('customers', 'json')}
-                              disabled={downloadingSample}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Download JSON</span>
-                            </button>
-                          </div>
-                        )}
+                      <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                        <Users className="w-4 h-4 text-blue-500" />
+                        <div>
+                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.customers}</div>
+                          <div className="text-xs text-gray-500">Customers</div>
+                        </div>
                       </div>
-                      <div className="dropdown-container relative">
-                        <button
-                          onClick={() => toggleDropdown('products')}
-                          className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <Package className="w-4 h-4 text-green-500" />
-                            <div>
-                              <div className="text-lg font-semibold text-gray-900">{sampleMetadata.products}</div>
-                              <div className="text-xs text-gray-500">Products</div>
-                            </div>
-                          </div>
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        </button>
-                        {openDropdown === 'products' && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                            <button
-                              onClick={() => handleDownloadSampleData('products', 'csv')}
-                              disabled={downloadingSample}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Download CSV</span>
-                            </button>
-                            <button
-                              onClick={() => handleDownloadSampleData('products', 'json')}
-                              disabled={downloadingSample}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Download JSON</span>
-                            </button>
-                          </div>
-                        )}
+                      <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                        <Package className="w-4 h-4 text-green-500" />
+                        <div>
+                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.products}</div>
+                          <div className="text-xs text-gray-500">Products</div>
+                        </div>
                       </div>
-                      <div className="dropdown-container relative">
-                        <button
-                          onClick={() => toggleDropdown('orders')}
-                          className="w-full flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                        >
-                          <div className="flex items-center space-x-2">
-                            <ShoppingCart className="w-4 h-4 text-purple-500" />
-                            <div>
-                              <div className="text-lg font-semibold text-gray-900">{sampleMetadata.orders}</div>
-                              <div className="text-xs text-gray-500">Orders</div>
-                            </div>
-                          </div>
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        </button>
-                        {openDropdown === 'orders' && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
-                            <button
-                              onClick={() => handleDownloadSampleData('orders', 'csv')}
-                              disabled={downloadingSample}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Download CSV</span>
-                            </button>
-                            <button
-                              onClick={() => handleDownloadSampleData('orders', 'json')}
-                              disabled={downloadingSample}
-                              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                              <Download className="w-3 h-3" />
-                              <span>Download JSON</span>
-                            </button>
-                          </div>
-                        )}
+                      <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
+                        <ShoppingCart className="w-4 h-4 text-purple-500" />
+                        <div>
+                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.orders}</div>
+                          <div className="text-xs text-gray-500">Orders</div>
+                        </div>
                       </div>
                     </div>
-                    {downloadError && (
-                      <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded-lg">
-                        <p className="text-xs text-red-600">{downloadError}</p>
-                      </div>
-                    )}
                     <button 
                       onClick={handleRunPipeline}
                       disabled={runningPipeline}
