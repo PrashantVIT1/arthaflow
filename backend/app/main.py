@@ -16,8 +16,11 @@ from app.database.config import Base, get_engine  # noqa: E402
 
 app = FastAPI(
     title="ArthaFlow API",
-    description="Enterprise ETL & Business Analytics Platform API",
+    description="Enterprise ETL & Business Analytics Platform API.",
     version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
 )
 
 # CORS Configuration - Read from environment variable or use default
