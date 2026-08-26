@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Card from '../components/ui/Card';
-import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check } from 'lucide-react';
+import { Upload, Activity, FileText, BarChart3, FileIcon, Database, Users, Package, ShoppingCart, AlertTriangle, PlusCircle, RefreshCw, Trash2, Check, ChevronDown } from 'lucide-react';
 import { pipelineApi, etlApi, SampleDatasetMetadata, UploadResponse, ETLRunResponse } from '../services/api';
 import { useETL } from '../context/ETLContext';
 
@@ -28,6 +28,12 @@ const DataPipeline: React.FC = () => {
   const [sampleMetadata, setSampleMetadata] = useState<SampleDatasetMetadata | null>(null);
   const [loadingSampleMetadata, setLoadingSampleMetadata] = useState(false);
   const [samplePipelineResult, setSamplePipelineResult] = useState<ETLRunResponse | null>(null);
+  const [customersDropdown, setCustomersDropdown] = useState(false);
+  const [productsDropdown, setProductsDropdown] = useState(false);
+  const [ordersDropdown, setOrdersDropdown] = useState(false);
+  const customersDropdownRef = useRef<HTMLDivElement>(null);
+  const productsDropdownRef = useRef<HTMLDivElement>(null);
+  const ordersDropdownRef = useRef<HTMLDivElement>(null);
 
   // Custom dataset state
   const [uploading, setUploading] = useState(false);
@@ -55,6 +61,107 @@ const DataPipeline: React.FC = () => {
 
     fetchSampleMetadata();
   }, [datasetSource]);
+
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (customersDropdownRef.current && !customersDropdownRef.current.contains(event.target as Node)) {
+        setCustomersDropdown(false);
+      }
+      if (productsDropdownRef.current && !productsDropdownRef.current.contains(event.target as Node)) {
+        setProductsDropdown(false);
+      }
+      if (ordersDropdownRef.current && !ordersDropdownRef.current.contains(event.target as Node)) {
+        setOrdersDropdown(false);
+      }
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setCustomersDropdown(false);
+        setProductsDropdown(false);
+        setOrdersDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, []);
+
+  // CSV to JSON conversion helper with proper quoted field handling
+  const csvToJson = async (csvUrl: string, filename: string) => {
+    try {
+      const response = await fetch(csvUrl);
+      const csvText = await response.text();
+      const lines = csvText.trim().split('\n');
+      
+      // Parse CSV with proper quoted field handling
+      const parseCSVLine = (line: string): string[] => {
+        const result: string[] = [];
+        let current = '';
+        let inQuotes = false;
+        
+        for (let i = 0; i < line.length; i++) {
+          const char = line[i];
+          if (char === '"') {
+            if (inQuotes && line[i + 1] === '"') {
+              // Escaped quote inside quoted field
+              current += '"';
+              i++;
+            } else {
+              // Toggle quote state
+              inQuotes = !inQuotes;
+            }
+          } else if (char === ',' && !inQuotes) {
+            // Field separator
+            result.push(current.trim());
+            current = '';
+          } else {
+            current += char;
+          }
+        }
+        result.push(current.trim());
+        return result;
+      };
+      
+      const headers = parseCSVLine(lines[0]);
+      const data = lines.slice(1).map(line => {
+        const values = parseCSVLine(line);
+        const obj: any = {};
+        headers.forEach((header, index) => {
+          const value = values[index]?.trim() || '';
+          // Convert numeric fields
+          if (header === 'id' || header === 'customer_id' || header === 'product_id' || 
+              header === 'quantity' || header === 'stock_quantity') {
+            obj[header.trim()] = parseInt(value, 10) || 0;
+          } else if (header === 'price' || header === 'cost' || header === 'unit_price' || 
+                     header === 'total_amount') {
+            obj[header.trim()] = parseFloat(value) || 0.0;
+          } else {
+            obj[header.trim()] = value;
+          }
+        });
+        return obj;
+      });
+      
+      const jsonBlob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(jsonBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Failed to convert CSV to JSON:', error);
+    }
+  };
 
   // Fetch and restore persistent ETL state on page load
   useEffect(() => {
@@ -413,26 +520,113 @@ const DataPipeline: React.FC = () => {
                       <p className="text-xs text-gray-500 ml-6">{sampleMetadata.description}</p>
                     )}
                     <div className="grid grid-cols-3 gap-4 mt-4">
-                      <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                        <Users className="w-4 h-4 text-blue-500" />
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.customers}</div>
-                          <div className="text-xs text-gray-500">Customers</div>
+                      <div className="relative" ref={customersDropdownRef}>
+                        <div
+                          className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                          onClick={() => setCustomersDropdown(!customersDropdown)}
+                        >
+                          <Users className="w-4 h-4 text-blue-500" />
+                          <div className="flex-1">
+                            <div className="text-lg font-semibold text-gray-900">{sampleMetadata.customers}</div>
+                            <div className="text-xs text-gray-500">Customers</div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
                         </div>
+                        {customersDropdown && (
+                          <div className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                            <div className="p-2">
+                              <button
+                                onClick={() => {
+                                  csvToJson('/data/customers.csv', 'customers.json');
+                                  setCustomersDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                              >
+                                JSON
+                              </button>
+                              <a
+                                href="/data/customers.csv"
+                                download="customers.csv"
+                                onClick={() => setCustomersDropdown(false)}
+                                className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                              >
+                                CSV
+                              </a>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                        <Package className="w-4 h-4 text-green-500" />
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.products}</div>
-                          <div className="text-xs text-gray-500">Products</div>
+                      <div className="relative" ref={productsDropdownRef}>
+                        <div
+                          className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                          onClick={() => setProductsDropdown(!productsDropdown)}
+                        >
+                          <Package className="w-4 h-4 text-green-500" />
+                          <div className="flex-1">
+                            <div className="text-lg font-semibold text-gray-900">{sampleMetadata.products}</div>
+                            <div className="text-xs text-gray-500">Products</div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
                         </div>
+                        {productsDropdown && (
+                          <div className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                            <div className="p-2">
+                              <button
+                                onClick={() => {
+                                  csvToJson('/data/products.csv', 'products.json');
+                                  setProductsDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                              >
+                                JSON
+                              </button>
+                              <a
+                                href="/data/products.csv"
+                                download="products.csv"
+                                onClick={() => setProductsDropdown(false)}
+                                className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                              >
+                                CSV
+                              </a>
+                            </div>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg">
-                        <ShoppingCart className="w-4 h-4 text-purple-500" />
-                        <div>
-                          <div className="text-lg font-semibold text-gray-900">{sampleMetadata.orders}</div>
-                          <div className="text-xs text-gray-500">Orders</div>
+                      <div className="relative" ref={ordersDropdownRef}>
+                        <div
+                          className="flex items-center space-x-2 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                          onClick={() => setOrdersDropdown(!ordersDropdown)}
+                        >
+                          <ShoppingCart className="w-4 h-4 text-purple-500" />
+                          <div className="flex-1">
+                            <div className="text-lg font-semibold text-gray-900">{sampleMetadata.orders}</div>
+                            <div className="text-xs text-gray-500">Orders</div>
+                          </div>
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
                         </div>
+                        {ordersDropdown && (
+                          <div className="absolute z-50 mt-2 w-full bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                            <div className="p-2">
+                              <button
+                                onClick={() => {
+                                  csvToJson('/data/orders.csv', 'orders.json');
+                                  setOrdersDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                              >
+                                JSON
+                              </button>
+                              <a
+                                href="/data/orders.csv"
+                                download="orders.csv"
+                                onClick={() => setOrdersDropdown(false)}
+                                className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md"
+                              >
+                                CSV
+                              </a>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                     <button 
