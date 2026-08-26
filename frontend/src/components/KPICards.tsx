@@ -1,4 +1,5 @@
 import React, { memo } from 'react';
+import { Link } from 'react-router-dom';
 import { DashboardKPI } from '../services/api';
 import { DollarSign, Package, Users, Tag, TrendingUp, Percent } from 'lucide-react';
 
@@ -15,6 +16,7 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
       format: 'currency',
       icon: DollarSign,
       color: 'bg-green-500',
+      route: null,
     },
     {
       title: 'Total Orders',
@@ -22,6 +24,7 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
       format: 'number',
       icon: Package,
       color: 'bg-blue-500',
+      route: '/orders',
     },
     {
       title: 'Total Customers',
@@ -29,6 +32,7 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
       format: 'number',
       icon: Users,
       color: 'bg-purple-500',
+      route: '/customers',
     },
     {
       title: 'Total Products',
@@ -36,6 +40,7 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
       format: 'number',
       icon: Tag,
       color: 'bg-orange-500',
+      route: '/products',
     },
     {
       title: 'Total Profit',
@@ -43,6 +48,7 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
       format: 'currency',
       icon: TrendingUp,
       color: 'bg-teal-500',
+      route: null,
     },
     {
       title: 'Profit Margin',
@@ -50,6 +56,7 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
       format: 'percentage',
       icon: Percent,
       color: 'bg-pink-500',
+      route: null,
     },
   ] as const;
 
@@ -80,24 +87,33 @@ const KPICards: React.FC<KPICardsProps> = memo(({ kpis, loading = false }) => {
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6 lg:mb-8">
-      {kpiData.map((kpi, index) => (
-        <div
-          key={index}
-          className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow duration-200 flex flex-col justify-between min-h-[120px] sm:min-h-[140px]"
-        >
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2">{kpi.title}</p>
-              <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
-                {formatValue(kpi.value, kpi.format)}
-              </p>
-            </div>
-            <div className={`w-10 h-10 sm:w-12 sm:h-12 ${kpi.color} rounded-lg flex items-center justify-center text-white ml-2 sm:ml-3 flex-shrink-0`}>
-              <kpi.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+      {kpiData.map((kpi, index) => {
+        const CardContent = (
+          <div className="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-shadow duration-200 flex flex-col justify-between min-h-[120px] sm:min-h-[140px] cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 sm:mb-2">{kpi.title}</p>
+                <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">
+                  {formatValue(kpi.value, kpi.format)}
+                </p>
+              </div>
+              <div className={`w-10 h-10 sm:w-12 sm:h-12 ${kpi.color} rounded-lg flex items-center justify-center text-white ml-2 sm:ml-3 flex-shrink-0`}>
+                <kpi.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+              </div>
             </div>
           </div>
-        </div>
-      ))}
+        );
+
+        if (kpi.route) {
+          return (
+            <Link key={index} to={kpi.route} className="block">
+              {CardContent}
+            </Link>
+          );
+        }
+
+        return <div key={index}>{CardContent}</div>;
+      })}
     </div>
   );
 });

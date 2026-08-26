@@ -1,0 +1,92 @@
+[
+  {
+    "id": "1",
+    "name": "John Smith",
+    "email": "john.smith@example.com",
+    "phone": "+1-555-0101",
+    "address": "123 Main St",
+    "city": "New York",
+    "country": "USA"
+  },
+  {
+    "id": "2",
+    "name": "Sarah Johnson",
+    "email": "sarah.johnson@example.com",
+    "phone": "+1-555-0102",
+    "address": "456 Oak Ave",
+    "city": "Los Angeles",
+    "country": "USA"
+  },
+  {
+    "id": "3",
+    "name": "Michael Brown",
+    "email": "michael.brown@example.com",
+    "phone": "+1-555-0103",
+    "address": "789 Pine Rd",
+    "city": "Chicago",
+    "country": "USA"
+  },
+  {
+    "id": "4",
+    "name": "Emily Davis",
+    "email": "emily.davis@example.com",
+    "phone": "+1-555-0104",
+    "address": "321 Elm St",
+    "city": "Houston",
+    "country": "USA"
+  },
+  {
+    "id": "5",
+    "name": "David Wilson",
+    "email": "david.wilson@example.com",
+    "phone": "+1-555-0105",
+    "address": "654 Maple Dr",
+    "city": "Phoenix",
+    "country": "USA"
+  },
+  {
+    "id": "6",
+    "name": "Emma Martinez",
+    "email": "emma.martinez@example.com",
+    "phone": "+1-555-0106",
+    "address": "987 Cedar Ln",
+    "city": "Miami",
+    "country": "USA"
+  },
+  {
+    "id": "7",
+    "name": "James Anderson",
+    "email": "james.anderson@example.com",
+    "phone": "+1-555-0107",
+    "address": "147 Birch Blvd",
+    "city": "Seattle",
+    "country": "USA"
+  },
+  {
+    "id": "8",
+    "name": "Olivia Taylor",
+    "email": "olivia.taylor@example.com",
+    "phone": "+1-555-0108",
+    "address": "258 Spruce Way",
+    "city": "Denver",
+    "country": "USA"
+  },
+  {
+    "id": "9",
+    "name": "William Thomas",
+    "email": "william.thomas@example.com",
+    "phone": "+1-555-0109",
+    "address": "369 Aspen Ct",
+    "city": "Boston",
+    "country": "USA"
+  },
+  {
+    "id": "10",
+    "name": "Sophia Garcia",
+    "email": "sophia.garcia@example.com",
+    "phone": "+1-555-0110",
+    "address": "741 Willow Pl",
+    "city": "Atlanta",
+    "country": "USA"
+  }
+]
