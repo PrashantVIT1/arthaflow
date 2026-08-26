@@ -569,6 +569,20 @@ class ETLService:
             self._update_status("error", error_message=str(e))
             self._add_log("error", f"ETL pipeline failed: {str(e)}", "error")
             response.message = f"ETL pipeline failed: {str(e)}"
+
+            # Delete uploaded files on failure if archive mode is not enabled
+            if (
+                request.dataset_source == "custom"
+                and request.files
+                and not self.is_archive_mode_enabled()
+            ):
+                self._delete_uploaded_files(request.files)
+                self._add_log(
+                    "info",
+                    "Uploaded files deleted after failed import",
+                    "cleanup",
+                )
+
             return response
 
     def _clear_tables(self, engine) -> None:
@@ -781,7 +795,9 @@ class ETLService:
                 raise ValueError(f"Parse error in {original_name}: {str(e)}")
             except Exception as e:
                 self._add_log(
-                    "error", f"Unexpected error reading {original_name}: {str(e)}", "load"
+                    "error",
+                    f"Unexpected error reading {original_name}: {str(e)}",
+                    "load",
                 )
                 raise
             # Calculate total_amount for orders if not present

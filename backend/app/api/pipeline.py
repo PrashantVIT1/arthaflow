@@ -32,7 +32,8 @@ def get_sample_dataset_metadata():
 
 @router.get("/sample-data/{table_name}/{format}")
 def download_sample_data(
-    table_name: Literal["customers", "products", "orders"], format: Literal["csv", "json"]
+    table_name: Literal["customers", "products", "orders"],
+    format: Literal["csv", "json"],
 ):
     """
     Download sample data for a specific table in the specified format.
