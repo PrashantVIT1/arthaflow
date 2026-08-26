@@ -43,9 +43,7 @@ def test_get_dashboard_kpis_structure(test_client: TestClient):
 
 def test_get_dashboard_with_date_filters(test_client: TestClient):
     """Test that get_dashboard accepts date filter parameters."""
-    response = test_client.get(
-        "/analytics/dashboard?start_date=2024-01-01&end_date=2024-12-31"
-    )
+    response = test_client.get("/analytics/dashboard?start_date=2024-01-01&end_date=2024-12-31")
     assert response.status_code == 200
 
 

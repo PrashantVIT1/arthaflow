@@ -59,9 +59,7 @@ def download_sample_data(
         csv_file = data_dir / file_map[table_name]
 
         if not csv_file.exists():
-            raise HTTPException(
-                status_code=404, detail=f"Sample data file not found: {csv_file}"
-            )
+            raise HTTPException(status_code=404, detail=f"Sample data file not found: {csv_file}")
 
         # Read the CSV file
         df = pd.read_csv(csv_file)

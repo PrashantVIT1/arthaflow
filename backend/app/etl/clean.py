@@ -14,9 +14,7 @@ class Cleaner:
         """Initialize cleaner with configuration."""
         self.config = config or ETLConfig()
 
-    def remove_duplicates(
-        self, df: pd.DataFrame, subset: Optional[list] = None
-    ) -> pd.DataFrame:
+    def remove_duplicates(self, df: pd.DataFrame, subset: Optional[list] = None) -> pd.DataFrame:
         """
         Remove duplicate rows from DataFrame.
 

@@ -76,11 +76,7 @@ def export_customers_csv(db: Session = Depends(get_db)):
                     customer.country or "",
                     customer.total_orders,
                     customer.total_spent,
-                    (
-                        customer.last_order_date.isoformat()
-                        if customer.last_order_date
-                        else ""
-                    ),
+                    (customer.last_order_date.isoformat() if customer.last_order_date else ""),
                     (customer.created_at.isoformat() if customer.created_at else ""),
                     (customer.updated_at.isoformat() if customer.updated_at else ""),
                 ]
