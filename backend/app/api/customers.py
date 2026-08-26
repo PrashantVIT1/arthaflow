@@ -4,13 +4,12 @@ import csv
 import io
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
-
 from app.database.config import get_db
 from app.schemas.customer import CustomerResponse
 from app.services.customer import CustomerService
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/customers", tags=["customers"])
 
@@ -76,7 +75,11 @@ def export_customers_csv(db: Session = Depends(get_db)):
                     customer.country or "",
                     customer.total_orders,
                     customer.total_spent,
-                    (customer.last_order_date.isoformat() if customer.last_order_date else ""),
+                    (
+                        customer.last_order_date.isoformat()
+                        if customer.last_order_date
+                        else ""
+                    ),
                     (customer.created_at.isoformat() if customer.created_at else ""),
                     (customer.updated_at.isoformat() if customer.updated_at else ""),
                 ]

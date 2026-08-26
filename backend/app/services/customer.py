@@ -2,10 +2,9 @@
 
 from typing import List
 
+from app.schemas.customer import CustomerResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
-from app.schemas.customer import CustomerResponse
 
 
 class CustomerService:

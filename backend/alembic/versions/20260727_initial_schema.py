@@ -7,7 +7,6 @@ Create Date: 2026-07-27
 """
 
 import sqlalchemy as sa
-
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -60,7 +59,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(op.f("ix_products_id"), "products", ["id"], unique=False)
-    op.create_index(op.f("ix_products_category"), "products", ["category"], unique=False)
+    op.create_index(
+        op.f("ix_products_category"), "products", ["category"], unique=False
+    )
 
     # Create orders table
     op.create_table(
@@ -99,10 +100,18 @@ def upgrade() -> None:
         sa.UniqueConstraint("order_number"),
     )
     op.create_index(op.f("ix_orders_id"), "orders", ["id"], unique=False)
-    op.create_index(op.f("ix_orders_order_number"), "orders", ["order_number"], unique=True)
-    op.create_index(op.f("ix_orders_customer_id"), "orders", ["customer_id"], unique=False)
-    op.create_index(op.f("ix_orders_product_id"), "orders", ["product_id"], unique=False)
-    op.create_index(op.f("ix_orders_order_date"), "orders", ["order_date"], unique=False)
+    op.create_index(
+        op.f("ix_orders_order_number"), "orders", ["order_number"], unique=True
+    )
+    op.create_index(
+        op.f("ix_orders_customer_id"), "orders", ["customer_id"], unique=False
+    )
+    op.create_index(
+        op.f("ix_orders_product_id"), "orders", ["product_id"], unique=False
+    )
+    op.create_index(
+        op.f("ix_orders_order_date"), "orders", ["order_date"], unique=False
+    )
     op.create_index(op.f("ix_orders_region"), "orders", ["region"], unique=False)
 
 

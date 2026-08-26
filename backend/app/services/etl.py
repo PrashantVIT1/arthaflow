@@ -6,18 +6,11 @@ from datetime import datetime
 from typing import List
 
 import pandas as pd
-from sqlalchemy import text
-
 from app.database.config import get_engine
-from app.schemas.etl import (
-    ArchiveModeVerifyResponse,
-    ETLLogEntry,
-    ETLLogsResponse,
-    ETLRunRequest,
-    ETLRunResponse,
-    ETLState,
-    ETLStatus,
-)
+from app.schemas.etl import (ArchiveModeVerifyResponse, ETLLogEntry,
+                             ETLLogsResponse, ETLRunRequest, ETLRunResponse,
+                             ETLState, ETLStatus)
+from sqlalchemy import text
 
 # Global state for ETL status and logs (in-memory for simplicity)
 etl_status = {
@@ -63,7 +56,9 @@ class ETLService:
     def _add_log(self, level: str, message: str, stage: str = None) -> None:
         """Add a log entry."""
         global etl_logs
-        log_entry = ETLLogEntry(timestamp=datetime.now(), level=level, message=message, stage=stage)
+        log_entry = ETLLogEntry(
+            timestamp=datetime.now(), level=level, message=message, stage=stage
+        )
         etl_logs.append(log_entry)
         # Keep only last 100 logs
         if len(etl_logs) > 100:
@@ -115,7 +110,9 @@ class ETLService:
         if last_execution is not None:
             etl_state["last_execution"] = last_execution
         if last_successful_import_timestamp is not None:
-            etl_state["last_successful_import_timestamp"] = last_successful_import_timestamp
+            etl_state["last_successful_import_timestamp"] = (
+                last_successful_import_timestamp
+            )
 
     def get_state(self) -> ETLState:
         """Get current persistent ETL state."""
@@ -127,7 +124,9 @@ class ETLService:
             upload_timestamp=etl_state["upload_timestamp"],
             pipeline_status=etl_state["pipeline_status"],
             last_execution=etl_state["last_execution"],
-            last_successful_import_timestamp=etl_state["last_successful_import_timestamp"],
+            last_successful_import_timestamp=etl_state[
+                "last_successful_import_timestamp"
+            ],
         )
 
     def get_status(self) -> ETLStatus:
@@ -417,14 +416,18 @@ class ETLService:
                 else:
                     self._update_status(
                         "error",
-                        error_message=("Replace mode only supports custom dataset source"),
+                        error_message=(
+                            "Replace mode only supports custom dataset source"
+                        ),
                     )
                     self._add_log(
                         "error",
                         "Replace mode only supports custom dataset source",
                         "initialization",
                     )
-                    response.message = "Replace mode only supports custom dataset source"
+                    response.message = (
+                        "Replace mode only supports custom dataset source"
+                    )
                     return response
 
             elif request.import_mode == "append":
@@ -461,7 +464,10 @@ class ETLService:
                     )
                     self._add_log(
                         "info",
-                        (f"Loading {len(request.files)} custom files " "in append mode"),
+                        (
+                            f"Loading {len(request.files)} custom files "
+                            "in append mode"
+                        ),
                         "load",
                     )
                     self._load_custom_data(
@@ -473,14 +479,18 @@ class ETLService:
                 else:
                     self._update_status(
                         "error",
-                        error_message=(f"Invalid dataset source: {request.dataset_source}"),
+                        error_message=(
+                            f"Invalid dataset source: {request.dataset_source}"
+                        ),
                     )
                     self._add_log(
                         "error",
                         f"Invalid dataset source: {request.dataset_source}",
                         "initialization",
                     )
-                    response.message = f"Invalid dataset source: {request.dataset_source}"
+                    response.message = (
+                        f"Invalid dataset source: {request.dataset_source}"
+                    )
                     return response
 
             else:
@@ -498,7 +508,9 @@ class ETLService:
 
             # Calculate total
             response.total_records_processed = (
-                response.customers_inserted + response.products_inserted + response.orders_inserted
+                response.customers_inserted
+                + response.products_inserted
+                + response.orders_inserted
             )
 
             # Calculate execution time
@@ -531,7 +543,9 @@ class ETLService:
                 dataset_source=request.dataset_source,
                 import_mode=request.import_mode,
                 uploaded_files=(
-                    [f["original_name"] for f in request.files] if request.files else None
+                    [f["original_name"] for f in request.files]
+                    if request.files
+                    else None
                 ),
                 last_execution={
                     "operation": operation_name,
@@ -569,7 +583,7 @@ class ETLService:
             self._update_status("error", error_message=str(e))
             self._add_log("error", f"ETL pipeline failed: {str(e)}", "error")
             response.message = f"ETL pipeline failed: {str(e)}"
-            
+
             # Delete uploaded files on failure if archive mode is not enabled
             if (
                 request.dataset_source == "custom"
@@ -582,7 +596,7 @@ class ETLService:
                     "Uploaded files deleted after failed import",
                     "cleanup",
                 )
-            
+
             return response
 
     def _clear_tables(self, engine) -> None:
@@ -619,7 +633,9 @@ class ETLService:
                             "cleanup",
                         )
 
-    def _load_sample_data(self, engine, response: ETLRunResponse, import_mode: str) -> None:
+    def _load_sample_data(
+        self, engine, response: ETLRunResponse, import_mode: str
+    ) -> None:
         """Load sample data from data directory."""
         # Load customers
         customers_file = os.path.join(self.data_dir, "customers.csv")
@@ -627,7 +643,9 @@ class ETLService:
             self._add_log("info", "Loading customers.csv", "load")
             df = pd.read_csv(customers_file)
             if import_mode == "append":
-                inserted, skipped = self._insert_with_duplicate_check(engine, df, "customers", "id")
+                inserted, skipped = self._insert_with_duplicate_check(
+                    engine, df, "customers", "id"
+                )
                 response.customers_inserted = inserted
                 response.customers_skipped = skipped
             else:
@@ -640,7 +658,9 @@ class ETLService:
             self._add_log("info", "Loading products.csv", "load")
             df = pd.read_csv(products_file)
             if import_mode == "append":
-                inserted, skipped = self._insert_with_duplicate_check(engine, df, "products", "id")
+                inserted, skipped = self._insert_with_duplicate_check(
+                    engine, df, "products", "id"
+                )
                 response.products_inserted = inserted
                 response.products_skipped = skipped
             else:
@@ -660,7 +680,9 @@ class ETLService:
             ):
                 df["total_amount"] = df["quantity"] * df["unit_price"]
             if import_mode == "append":
-                inserted, skipped = self._insert_with_duplicate_check(engine, df, "orders", "id")
+                inserted, skipped = self._insert_with_duplicate_check(
+                    engine, df, "orders", "id"
+                )
                 response.orders_inserted = inserted
                 response.orders_skipped = skipped
             else:
@@ -775,10 +797,14 @@ class ETLService:
             try:
                 if file_ext == ".json":
                     df = pd.read_json(file_path)
-                    self._add_log("info", f"Parsed JSON file with {len(df)} rows", "load")
+                    self._add_log(
+                        "info", f"Parsed JSON file with {len(df)} rows", "load"
+                    )
                 elif file_ext == ".csv":
                     df = pd.read_csv(file_path)
-                    self._add_log("info", f"Parsed CSV file with {len(df)} rows", "load")
+                    self._add_log(
+                        "info", f"Parsed CSV file with {len(df)} rows", "load"
+                    )
                 else:
                     self._add_log("error", f"Unsupported file type: {file_ext}", "load")
                     raise ValueError(
@@ -788,14 +814,20 @@ class ETLService:
                 self._add_log("error", f"File type error: {str(e)}", "load")
                 raise
             except pd.errors.JSONDecodeError as e:
-                self._add_log("error", f"Invalid JSON syntax in {original_name}: {str(e)}", "load")
+                self._add_log(
+                    "error", f"Invalid JSON syntax in {original_name}: {str(e)}", "load"
+                )
                 raise ValueError(f"Invalid JSON syntax in {original_name}: {str(e)}")
             except pd.errors.ParserError as e:
-                self._add_log("error", f"Parse error in {original_name}: {str(e)}", "load")
+                self._add_log(
+                    "error", f"Parse error in {original_name}: {str(e)}", "load"
+                )
                 raise ValueError(f"Parse error in {original_name}: {str(e)}")
             except Exception as e:
                 self._add_log(
-                    "error", f"Unexpected error reading {original_name}: {str(e)}", "load"
+                    "error",
+                    f"Unexpected error reading {original_name}: {str(e)}",
+                    "load",
                 )
                 raise
             # Calculate total_amount for orders if not present
@@ -808,7 +840,9 @@ class ETLService:
                 df["total_amount"] = df["quantity"] * df["unit_price"]
 
             if import_mode == "append":
-                inserted, skipped = self._insert_with_duplicate_check(engine, df, table_name, "id")
+                inserted, skipped = self._insert_with_duplicate_check(
+                    engine, df, table_name, "id"
+                )
                 if table_name == "customers":
                     response.customers_inserted += inserted
                     response.customers_skipped += skipped

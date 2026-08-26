@@ -3,7 +3,6 @@
 from typing import Dict
 
 import pandas as pd
-
 from app.etl.config import ETLConfig
 
 
@@ -26,7 +25,10 @@ class Transformer:
         """
         df_transformed = df.copy()
 
-        if "quantity" in df_transformed.columns and "unit_price" in df_transformed.columns:
+        if (
+            "quantity" in df_transformed.columns
+            and "unit_price" in df_transformed.columns
+        ):
             df_transformed["total_amount"] = (
                 df_transformed["quantity"] * df_transformed["unit_price"]
             )
@@ -34,7 +36,9 @@ class Transformer:
 
         return df_transformed
 
-    def calculate_profit(self, orders_df: pd.DataFrame, products_df: pd.DataFrame) -> pd.DataFrame:
+    def calculate_profit(
+        self, orders_df: pd.DataFrame, products_df: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         Calculate profit for orders by merging with products.
 
@@ -56,7 +60,9 @@ class Transformer:
 
         # Calculate profit: (price - cost) * quantity
         if "cost" in merged.columns:
-            merged["profit"] = (merged["unit_price"] - merged["cost"]) * merged["quantity"]
+            merged["profit"] = (merged["unit_price"] - merged["cost"]) * merged[
+                "quantity"
+            ]
             print("Calculated profit for orders")
 
         # Remove the duplicate id column from products
@@ -132,11 +138,16 @@ class Transformer:
         if "order_date" in df_transformed.columns:
             df_transformed["order_year"] = df_transformed["order_date"].dt.year
             df_transformed["order_month"] = df_transformed["order_date"].dt.month
-            df_transformed["order_month_name"] = df_transformed["order_date"].dt.strftime("%B")
+            df_transformed["order_month_name"] = df_transformed[
+                "order_date"
+            ].dt.strftime("%B")
             print("Added order_year, order_month, order_month_name")
 
         # Add profit margin percentage
-        if "profit" in df_transformed.columns and "total_amount" in df_transformed.columns:
+        if (
+            "profit" in df_transformed.columns
+            and "total_amount" in df_transformed.columns
+        ):
             df_transformed["profit_margin"] = (
                 (df_transformed["profit"] / df_transformed["total_amount"]) * 100
             ).round(2)
@@ -144,7 +155,9 @@ class Transformer:
 
         return df_transformed
 
-    def transform_orders(self, orders_df: pd.DataFrame, products_df: pd.DataFrame) -> pd.DataFrame:
+    def transform_orders(
+        self, orders_df: pd.DataFrame, products_df: pd.DataFrame
+    ) -> pd.DataFrame:
         """
         Transform orders data with calculations.
 
@@ -178,7 +191,9 @@ class Transformer:
         transformed_data = {}
 
         # Transform orders with calculations
-        transformed_data["orders"] = self.transform_orders(data["orders"], data["products"])
+        transformed_data["orders"] = self.transform_orders(
+            data["orders"], data["products"]
+        )
 
         # Customers and products don't need transformation
         transformed_data["customers"] = data["customers"]
@@ -188,6 +203,8 @@ class Transformer:
         transformed_data["merged"] = self.merge_datasets(transformed_data)
 
         # Add derived columns to merged dataset
-        transformed_data["merged"] = self.add_derived_columns(transformed_data["merged"])
+        transformed_data["merged"] = self.add_derived_columns(
+            transformed_data["merged"]
+        )
 
         return transformed_data

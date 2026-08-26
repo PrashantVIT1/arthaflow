@@ -5,11 +5,10 @@ from pathlib import Path
 from typing import Literal
 
 import pandas as pd
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import StreamingResponse
-
 from app.schemas.pipeline import SampleDatasetMetadata
 from app.services.pipeline import PipelineService
+from fastapi import APIRouter, HTTPException
+from fastapi.responses import StreamingResponse
 
 router = APIRouter(prefix="/pipeline", tags=["pipeline"])
 
@@ -32,7 +31,8 @@ def get_sample_dataset_metadata():
 
 @router.get("/sample-data/{table_name}/{format}")
 def download_sample_data(
-    table_name: Literal["customers", "products", "orders"], format: Literal["csv", "json"]
+    table_name: Literal["customers", "products", "orders"],
+    format: Literal["csv", "json"],
 ):
     """
     Download sample data for a specific table in the specified format.
@@ -58,7 +58,9 @@ def download_sample_data(
         csv_file = data_dir / file_map[table_name]
 
         if not csv_file.exists():
-            raise HTTPException(status_code=404, detail=f"Sample data file not found: {csv_file}")
+            raise HTTPException(
+                status_code=404, detail=f"Sample data file not found: {csv_file}"
+            )
 
         # Read the CSV file
         df = pd.read_csv(csv_file)

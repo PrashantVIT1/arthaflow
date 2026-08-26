@@ -4,19 +4,13 @@ import csv
 import io
 from typing import List, Optional
 
+from app.database.config import get_db
+from app.schemas.analytics import (CategorySales, DashboardResponse,
+                                   MonthlySales, RegionalSales, TopProduct)
+from app.services.analytics import AnalyticsService
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-
-from app.database.config import get_db
-from app.schemas.analytics import (
-    CategorySales,
-    DashboardResponse,
-    MonthlySales,
-    RegionalSales,
-    TopProduct,
-)
-from app.services.analytics import AnalyticsService
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
@@ -322,7 +316,9 @@ def export_dashboard_csv(
         return StreamingResponse(
             io.BytesIO(output.getvalue().encode("utf-8")),
             media_type="text/csv",
-            headers={"Content-Disposition": ('attachment; filename="dashboard_summary.csv"')},
+            headers={
+                "Content-Disposition": ('attachment; filename="dashboard_summary.csv"')
+            },
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

@@ -56,7 +56,9 @@ class ETLPipeline:
         try:
             extracted_data = self.extractor.extract_all()
             results["extract"]["success"] = True
-            results["extract"]["rows"] = {table: len(df) for table, df in extracted_data.items()}
+            results["extract"]["rows"] = {
+                table: len(df) for table, df in extracted_data.items()
+            }
         except Exception as e:
             results["extract"]["success"] = False
             results["extract"]["error"] = str(e)
@@ -88,7 +90,9 @@ class ETLPipeline:
         try:
             cleaned_data = self.cleaner.clean_all(extracted_data)
             results["clean"]["success"] = True
-            results["clean"]["rows"] = {table: len(df) for table, df in cleaned_data.items()}
+            results["clean"]["rows"] = {
+                table: len(df) for table, df in cleaned_data.items()
+            }
         except Exception as e:
             results["clean"]["success"] = False
             results["clean"]["error"] = str(e)

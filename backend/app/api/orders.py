@@ -3,14 +3,13 @@
 import csv
 import io
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from fastapi.responses import StreamingResponse
-from sqlalchemy.orm import Session
-
 from app.database.config import get_db
 from app.models.order import Order
 from app.schemas.order import OrderResponse
 from app.schemas.pagination import PaginatedResponse
+from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi.responses import StreamingResponse
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/orders", tags=["orders"])
 
@@ -44,7 +43,13 @@ def get_orders(
         last_page = page == total_pages or total_pages == 0
 
         # Query with offset and limit (database-level pagination)
-        orders = db.query(Order).order_by(Order.id).offset((page - 1) * size).limit(size).all()
+        orders = (
+            db.query(Order)
+            .order_by(Order.id)
+            .offset((page - 1) * size)
+            .limit(size)
+            .all()
+        )
 
         return {
             "items": orders,

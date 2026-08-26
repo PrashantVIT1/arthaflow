@@ -3,10 +3,9 @@
 from typing import Dict
 
 import pandas as pd
-from sqlalchemy import text
-
 from app.database.config import get_engine
 from app.etl.config import ETLConfig
+from sqlalchemy import text
 
 
 class Loader:
@@ -61,7 +60,9 @@ class Loader:
         """
         try:
             with self.engine.connect() as conn:
-                conn.execute(text(f"TRUNCATE TABLE {table_name} " "RESTART IDENTITY CASCADE;"))
+                conn.execute(
+                    text(f"TRUNCATE TABLE {table_name} " "RESTART IDENTITY CASCADE;")
+                )
                 conn.commit()
                 print(f"Truncated table {table_name}")
         except Exception as e:
@@ -147,7 +148,9 @@ class Loader:
 
         return self.load_dataframe(df_to_load, "products", if_exists="append")
 
-    def load_all(self, data: Dict[str, pd.DataFrame], truncate: bool = False) -> Dict[str, int]:
+    def load_all(
+        self, data: Dict[str, pd.DataFrame], truncate: bool = False
+    ) -> Dict[str, int]:
         """
         Load all data sources into database.
 
@@ -174,7 +177,9 @@ class Loader:
         # Load customers first (no foreign keys)
         if "customers" in data:
             try:
-                results["customers"] = self.load_customers(data["customers"], truncate=False)
+                results["customers"] = self.load_customers(
+                    data["customers"], truncate=False
+                )
             except Exception as e:
                 print(f"Error loading customers: {e}")
                 results["customers"] = 0
@@ -182,7 +187,9 @@ class Loader:
         # Load products second (no foreign keys)
         if "products" in data:
             try:
-                results["products"] = self.load_products(data["products"], truncate=False)
+                results["products"] = self.load_products(
+                    data["products"], truncate=False
+                )
             except Exception as e:
                 print(f"Error loading products: {e}")
                 results["products"] = 0

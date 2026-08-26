@@ -2,10 +2,9 @@
 
 from typing import Any, Dict, List
 
+from app.models import Order, Product
 from sqlalchemy import extract, func
 from sqlalchemy.orm import Session
-
-from app.models import Order, Product
 
 
 class AnalyticsRepository:
@@ -60,17 +59,21 @@ class AnalyticsRepository:
 
         # Total customers (unique customers from filtered orders)
         total_customers = (
-            query.with_entities(func.count(func.distinct(Order.customer_id))).scalar() or 0
+            query.with_entities(func.count(func.distinct(Order.customer_id))).scalar()
+            or 0
         )
 
         # Total products (unique products from filtered orders)
         total_products = (
-            query.with_entities(func.count(func.distinct(Order.product_id))).scalar() or 0
+            query.with_entities(func.count(func.distinct(Order.product_id))).scalar()
+            or 0
         )
 
         # Calculate profit (need to join with products)
         profit_query = self.db.query(
-            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity)
+            func.sum(
+                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+            )
         ).join(Product, Order.product_id == Product.id)
 
         if start_date:
@@ -120,9 +123,9 @@ class AnalyticsRepository:
             extract("month", Order.order_date).label("month"),
             func.sum(Order.total_amount).label("revenue"),
             func.count(Order.id).label("orders"),
-            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label(
-                "profit"
-            ),
+            func.sum(
+                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+            ).label("profit"),
         ).join(Product, Order.product_id == Product.id)
 
         # Apply filters
@@ -137,7 +140,9 @@ class AnalyticsRepository:
 
         query = query.group_by(
             extract("year", Order.order_date), extract("month", Order.order_date)
-        ).order_by(extract("year", Order.order_date), extract("month", Order.order_date))
+        ).order_by(
+            extract("year", Order.order_date), extract("month", Order.order_date)
+        )
 
         results = query.all()
 
@@ -186,9 +191,9 @@ class AnalyticsRepository:
             Product.category,
             func.sum(Order.total_amount).label("revenue"),
             func.count(Order.id).label("orders"),
-            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label(
-                "profit"
-            ),
+            func.sum(
+                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+            ).label("profit"),
         ).join(Product, Order.product_id == Product.id)
 
         # Apply filters
@@ -199,7 +204,9 @@ class AnalyticsRepository:
         if region:
             query = query.filter(Order.region == region)
 
-        query = query.group_by(Product.category).order_by(func.sum(Order.total_amount).desc())
+        query = query.group_by(Product.category).order_by(
+            func.sum(Order.total_amount).desc()
+        )
 
         results = query.all()
 
@@ -231,9 +238,9 @@ class AnalyticsRepository:
             Order.region,
             func.sum(Order.total_amount).label("revenue"),
             func.count(Order.id).label("orders"),
-            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label(
-                "profit"
-            ),
+            func.sum(
+                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+            ).label("profit"),
         ).join(Product, Order.product_id == Product.id)
 
         # Apply filters
@@ -244,7 +251,9 @@ class AnalyticsRepository:
         if category:
             query = query.filter(Product.category == category)
 
-        query = query.group_by(Order.region).order_by(func.sum(Order.total_amount).desc())
+        query = query.group_by(Order.region).order_by(
+            func.sum(Order.total_amount).desc()
+        )
 
         results = query.all()
 
@@ -285,9 +294,9 @@ class AnalyticsRepository:
             Product.category,
             func.sum(Order.quantity).label("quantity_sold"),
             func.sum(Order.total_amount).label("revenue"),
-            func.sum((Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity).label(
-                "profit"
-            ),
+            func.sum(
+                (Order.unit_price - func.coalesce(Product.cost, 0)) * Order.quantity
+            ).label("profit"),
         ).join(Order, Order.product_id == Product.id)
 
         # Apply filters

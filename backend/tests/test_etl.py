@@ -117,7 +117,9 @@ def test_transformer_calculate_profit_adds_profit_column():
     from app.etl.transform import Transformer
 
     transformer = Transformer()
-    orders_df = pd.DataFrame({"id": [1], "product_id": [1], "quantity": [2], "unit_price": [10.0]})
+    orders_df = pd.DataFrame(
+        {"id": [1], "product_id": [1], "quantity": [2], "unit_price": [10.0]}
+    )
     products_df = pd.DataFrame({"id": [1], "cost": [5.0]})
     result = transformer.calculate_profit(orders_df, products_df)
     assert "profit" in result.columns

@@ -3,7 +3,6 @@
 from typing import Dict, List, Tuple
 
 import pandas as pd
-
 from app.etl.config import ETLConfig
 
 
@@ -30,7 +29,9 @@ class Validator:
         missing = [col for col in required if col not in df.columns]
 
         if missing:
-            self.validation_errors.append(f"{table_name}: Missing required columns: {missing}")
+            self.validation_errors.append(
+                f"{table_name}: Missing required columns: {missing}"
+            )
             return False
 
         return True
@@ -54,7 +55,8 @@ class Validator:
                 actual_type = str(df[col].dtype)
                 if expected_type not in actual_type:
                     type_errors.append(
-                        f"{table_name}.{col}: Expected {expected_type}, " f"got {actual_type}"
+                        f"{table_name}.{col}: Expected {expected_type}, "
+                        f"got {actual_type}"
                     )
 
         if type_errors:
@@ -88,7 +90,9 @@ class Validator:
 
         return null_counts
 
-    def check_duplicates(self, df: pd.DataFrame, table_name: str, id_column: str = "id") -> int:
+    def check_duplicates(
+        self, df: pd.DataFrame, table_name: str, id_column: str = "id"
+    ) -> int:
         """
         Check for duplicate rows based on ID column.
 
@@ -107,12 +111,15 @@ class Validator:
 
         if duplicate_count > 0:
             self.validation_errors.append(
-                f"{table_name}: {duplicate_count} duplicate " f"{id_column} values found"
+                f"{table_name}: {duplicate_count} duplicate "
+                f"{id_column} values found"
             )
 
         return duplicate_count
 
-    def validate_dataframe(self, df: pd.DataFrame, table_name: str) -> Tuple[bool, List[str]]:
+    def validate_dataframe(
+        self, df: pd.DataFrame, table_name: str
+    ) -> Tuple[bool, List[str]]:
         """
         Run all validation checks on a DataFrame.
 
@@ -134,7 +141,9 @@ class Validator:
         is_valid = len(self.validation_errors) == 0
         return is_valid, self.validation_errors
 
-    def validate_all(self, data: Dict[str, pd.DataFrame]) -> Dict[str, Tuple[bool, List[str]]]:
+    def validate_all(
+        self, data: Dict[str, pd.DataFrame]
+    ) -> Dict[str, Tuple[bool, List[str]]]:
         """
         Validate all DataFrames.
 
