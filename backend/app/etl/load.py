@@ -3,9 +3,10 @@
 from typing import Dict
 
 import pandas as pd
+from sqlalchemy import text
+
 from app.database.config import get_engine
 from app.etl.config import ETLConfig
-from sqlalchemy import text
 
 
 class Loader:

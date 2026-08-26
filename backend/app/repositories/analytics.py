@@ -2,9 +2,10 @@
 
 from typing import Any, Dict, List
 
-from app.models import Order, Product
 from sqlalchemy import extract, func
 from sqlalchemy.orm import Session
+
+from app.models import Order, Product
 
 
 class AnalyticsRepository:

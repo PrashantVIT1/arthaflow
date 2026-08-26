@@ -6,10 +6,11 @@ Run this script to populate the database with sample data.
 import random
 from datetime import datetime, timedelta
 
-from app.database.config import SessionLocal
-from app.models import Customer, Order, Product
 from dotenv import load_dotenv
 from sqlalchemy.orm import Session
+
+from app.database.config import SessionLocal
+from app.models import Customer, Order, Product
 
 # Load environment variables
 load_dotenv()

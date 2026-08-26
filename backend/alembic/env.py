@@ -3,9 +3,10 @@ import sys
 from logging.config import fileConfig
 from pathlib import Path
 
-from alembic import context
 from dotenv import load_dotenv
 from sqlalchemy import MetaData, engine_from_config, pool
+
+from alembic import context
 
 # Add the backend directory to Python path
 sys.path.append(str(Path(__file__).resolve().parents[1]))

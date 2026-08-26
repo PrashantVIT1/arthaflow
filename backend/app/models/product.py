@@ -1,6 +1,7 @@
-from app.database.config import Base
 from sqlalchemy import Column, DateTime, Float, Integer, String
 from sqlalchemy.sql import func
+
+from app.database.config import Base
 
 
 class Product(Base):

@@ -6,11 +6,18 @@ from datetime import datetime
 from typing import List
 
 import pandas as pd
-from app.database.config import get_engine
-from app.schemas.etl import (ArchiveModeVerifyResponse, ETLLogEntry,
-                             ETLLogsResponse, ETLRunRequest, ETLRunResponse,
-                             ETLState, ETLStatus)
 from sqlalchemy import text
+
+from app.database.config import get_engine
+from app.schemas.etl import (
+    ArchiveModeVerifyResponse,
+    ETLLogEntry,
+    ETLLogsResponse,
+    ETLRunRequest,
+    ETLRunResponse,
+    ETLState,
+    ETLStatus,
+)
 
 # Global state for ETL status and logs (in-memory for simplicity)
 etl_status = {
